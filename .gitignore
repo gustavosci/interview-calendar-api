@@ -9,6 +9,7 @@
 **/generated
 classes/
 *.iml
+*.log
 
 # Created automatically by Mac OS X.
 .DS_Store

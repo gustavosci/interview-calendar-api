@@ -21,11 +21,14 @@ import java.net.URI;
 public class DynamodbConfiguration {
 
     @Bean
-    public DynamoDbEnhancedClient ddbEnhancedClient(@Value("${aws.dynamodb.url}") final String dynamodbUrl) {
-        var dynamoDbClient = DynamoDbClient.builder()
+    public DynamoDbClient dynamoDbClient(@Value("${aws.dynamodb.url}") final String dynamodbUrl) {
+        return DynamoDbClient.builder()
                 .endpointOverride(URI.create(dynamodbUrl))
                 .build();
+    }
 
+    @Bean
+    public DynamoDbEnhancedClient ddbEnhancedClient(final DynamoDbClient dynamoDbClient) {
         return DynamoDbEnhancedClient.builder()
                 .dynamoDbClient(dynamoDbClient)
                 .build();
