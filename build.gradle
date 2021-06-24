@@ -19,9 +19,14 @@ repositories {
 }
 
 dependencies {
+	// Spring
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	compileOnly 'org.projectlombok:lombok'
-	annotationProcessor 'org.projectlombok:lombok'
+
+	// External libraries
+	implementation("software.amazon.awssdk:dynamodb:2.16.25")
+	implementation("software.amazon.awssdk:dynamodb-enhanced:2.16.25")
+
+	// Test
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.testcontainers:junit-jupiter:1.15.3'
 }
