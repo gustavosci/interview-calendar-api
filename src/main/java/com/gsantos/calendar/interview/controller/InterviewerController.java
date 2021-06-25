@@ -5,9 +5,9 @@
 
 package com.gsantos.calendar.interview.controller;
 
-import com.gsantos.calendar.interview.model.request.RegisterUserRequest;
+import com.gsantos.calendar.interview.model.request.AvailabilityRequest;
 import com.gsantos.calendar.interview.model.response.ErrorResponse;
-import com.gsantos.calendar.interview.service.RegisterUserService;
+import com.gsantos.calendar.interview.service.SetInterviewerAvailabilityService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,22 +23,22 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("/v1/users")
-public class UserController {
+@RequestMapping("/v1/interviewers")
+public class InterviewerController {
 
-    private final RegisterUserService registerUserService;
+    private final SetInterviewerAvailabilityService setInterviewerAvailabilityService;
 
-    public UserController(RegisterUserService registerUserService) {
-        this.registerUserService = registerUserService;
+    public InterviewerController(SetInterviewerAvailabilityService setInterviewerAvailabilityService) {
+        this.setInterviewerAvailabilityService = setInterviewerAvailabilityService;
     }
 
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation("Register User")
+    @PostMapping(value = "/availability", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation("Set the interviewer's available slots")
     @ApiResponses(
             value = {
                     @ApiResponse(
-                            code = 201,
-                            message = "Created"
+                            code = 200,
+                            message = "Ok"
                     ),
                     @ApiResponse(
                             code = 400,
@@ -45,8 +46,8 @@ public class UserController {
                             response = ErrorResponse.class
                     ),
                     @ApiResponse(
-                            code = 409,
-                            message = "Conflict"
+                            code = 404,
+                            message = "Not Found"
                     ),
                     @ApiResponse(
                             code = 500,
@@ -55,8 +56,8 @@ public class UserController {
                     )
             }
     )
-    @ResponseStatus(HttpStatus.CREATED)
-    public void registerUser(@Valid @RequestBody final RegisterUserRequest request) {
-        registerUserService.registerUser(request);
+    @ResponseStatus(HttpStatus.OK)
+    public void availability(@RequestHeader("username") final String username, @Valid @RequestBody final AvailabilityRequest request) {
+        setInterviewerAvailabilityService.set(username, request);
     }
 }

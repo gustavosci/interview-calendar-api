@@ -5,7 +5,7 @@
 
 package com.gsantos.calendar.interview.repository;
 
-import com.gsantos.calendar.interview.domain.ddb.UserDDB;
+import com.gsantos.calendar.interview.model.ddb.UserDDB;
 import com.gsantos.calendar.interview.fixtures.UserDDBBuilder;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;

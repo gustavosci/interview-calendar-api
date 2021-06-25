@@ -14,18 +14,21 @@ import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.AttributeDefinition;
 import software.amazon.awssdk.services.dynamodb.model.CreateTableRequest;
 import software.amazon.awssdk.services.dynamodb.model.DescribeTableRequest;
+import software.amazon.awssdk.services.dynamodb.model.GlobalSecondaryIndex;
 import software.amazon.awssdk.services.dynamodb.model.KeySchemaElement;
 import software.amazon.awssdk.services.dynamodb.model.KeyType;
+import software.amazon.awssdk.services.dynamodb.model.Projection;
+import software.amazon.awssdk.services.dynamodb.model.ProjectionType;
 import software.amazon.awssdk.services.dynamodb.model.ProvisionedThroughput;
 import software.amazon.awssdk.services.dynamodb.model.ResourceNotFoundException;
 import software.amazon.awssdk.services.dynamodb.model.ScalarAttributeType;
 
 
 /*
-*
-* PS: This is not a "real-life" code. On normal circumstances, the DDB tables would already be created.
-*     However, in order to speed up the challenge, I've decided to run this logic during the startup.
-*
+ *
+ * PS: This is not a production code. On normal circumstances, the DDB tables would already be created.
+ *     However, in order to speed up the challenge, I've decided to run this logic during the startup.
+ *
  */
 @Component
 public class SetupDynamodbTablesInitializer implements InitializingBean {
@@ -69,26 +72,47 @@ public class SetupDynamodbTablesInitializer implements InitializingBean {
         var request = CreateTableRequest.builder()
                 .attributeDefinitions(
                         AttributeDefinition.builder()
-                            .attributeName("date")
-                            .attributeType(ScalarAttributeType.S)
-                            .build(),
+                                .attributeName("date")
+                                .attributeType(ScalarAttributeType.S)
+                                .build(),
                         AttributeDefinition.builder()
-                            .attributeName("user")
-                            .attributeType(ScalarAttributeType.S)
-                            .build())
+                                .attributeName("user")
+                                .attributeType(ScalarAttributeType.S)
+                                .build())
                 .keySchema(
                         KeySchemaElement.builder()
-                            .attributeName("date")
-                            .keyType(KeyType.HASH)
-                            .build(),
+                                .attributeName("date")
+                                .keyType(KeyType.HASH)
+                                .build(),
                         KeySchemaElement.builder()
-                            .attributeName("user")
-                            .keyType(KeyType.RANGE)
-                            .build())
+                                .attributeName("user")
+                                .keyType(KeyType.RANGE)
+                                .build())
                 .provisionedThroughput(ProvisionedThroughput.builder()
                         .readCapacityUnits(10L)
                         .writeCapacityUnits(10L)
                         .build())
+                .globalSecondaryIndexes(
+                        GlobalSecondaryIndex.builder()
+                                .indexName("user-index")
+                                .keySchema(
+                                        KeySchemaElement.builder()
+                                                .attributeName("user")
+                                                .keyType(KeyType.HASH)
+                                                .build(),
+                                        KeySchemaElement.builder()
+                                                .attributeName("date")
+                                                .keyType(KeyType.RANGE)
+                                                .build()
+                                )
+                                .provisionedThroughput(ProvisionedThroughput.builder()
+                                        .readCapacityUnits(10L)
+                                        .writeCapacityUnits(10L)
+                                        .build())
+                                .projection(Projection.builder().projectionType(ProjectionType.ALL).build())
+                                .build()
+
+                )
                 .tableName(calendarTableName)
                 .build();
 

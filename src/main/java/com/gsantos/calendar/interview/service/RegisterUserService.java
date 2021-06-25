@@ -5,7 +5,7 @@
 
 package com.gsantos.calendar.interview.service;
 
-import com.gsantos.calendar.interview.domain.request.RegisterUserRequest;
+import com.gsantos.calendar.interview.model.request.RegisterUserRequest;
 import com.gsantos.calendar.interview.exception.ConflictUserException;
 import com.gsantos.calendar.interview.mapping.UserDDBMapper;
 import com.gsantos.calendar.interview.repository.UserRepository;

@@ -3,33 +3,25 @@
  * Author: Gustavo Santos.
  */
 
-package com.gsantos.calendar.interview.domain.ddb;
+package com.gsantos.calendar.interview.model.request;
 
-import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
-import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
+import com.gsantos.calendar.interview.model.domain.UserType;
 
+import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
-@DynamoDbBean
-public class UserDDB {
-    public enum UserType {
-        INTERVIEWER, CANDIDATE;
-    }
+public class RegisterUserRequest {
 
+    @NotNull
+    // TODO: REGEX TO NOT PERMIT SPACES AND LIMIT MAX CARACHTHER
     private String username;
+
+    @NotNull
     private String name;
+
+    @NotNull
     private UserType type;
 
-    public UserDDB() {
-    }
-
-    public UserDDB(String username, String name, UserType type) {
-        this.username = username;
-        this.name = name;
-        this.type = type;
-    }
-
-    @DynamoDbPartitionKey
     public String getUsername() {
         return username;
     }
@@ -58,14 +50,23 @@ public class UserDDB {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        UserDDB userDDB = (UserDDB) o;
-        return Objects.equals(username, userDDB.username) &&
-                Objects.equals(name, userDDB.name) &&
-                type == userDDB.type;
+        RegisterUserRequest that = (RegisterUserRequest) o;
+        return Objects.equals(username, that.username) &&
+                Objects.equals(name, that.name) &&
+                type == that.type;
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(username, name, type);
+    }
+
+    @Override
+    public String toString() {
+        return "CreateUserRequest{" +
+                "username='" + username + '\'' +
+                ", name='" + name + '\'' +
+                ", type=" + type +
+                '}';
     }
 }

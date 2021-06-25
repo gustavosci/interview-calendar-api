@@ -3,10 +3,12 @@
  * Author: Gustavo Santos.
  */
 
-package com.gsantos.calendar.interview.domain.ddb;
+package com.gsantos.calendar.interview.model.ddb;
 
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSecondaryPartitionKey;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSecondarySortKey;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSortKey;
 
 import java.time.LocalTime;
@@ -19,6 +21,7 @@ public class CalendarDDB {
     private List<SlotDDB> availableSlots;
 
     @DynamoDbPartitionKey
+    @DynamoDbSecondarySortKey(indexNames = "user-index")
     public String getDate() {
         return date;
     }
@@ -28,6 +31,7 @@ public class CalendarDDB {
     }
 
     @DynamoDbSortKey
+    @DynamoDbSecondaryPartitionKey(indexNames = "user-index")
     public String getUser() {
         return user;
     }

@@ -3,26 +3,33 @@
  * Author: Gustavo Santos.
  */
 
-package com.gsantos.calendar.interview.domain.request;
+package com.gsantos.calendar.interview.model.ddb;
 
-import javax.validation.constraints.NotNull;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
+
 import java.util.Objects;
 
-public class RegisterUserRequest {
-
+@DynamoDbBean
+public class UserDDB {
     public enum UserType {
         INTERVIEWER, CANDIDATE;
     }
 
-    @NotNull
     private String username;
-
-    @NotNull
     private String name;
-
-    @NotNull
     private UserType type;
 
+    public UserDDB() {
+    }
+
+    public UserDDB(String username, String name, UserType type) {
+        this.username = username;
+        this.name = name;
+        this.type = type;
+    }
+
+    @DynamoDbPartitionKey
     public String getUsername() {
         return username;
     }
@@ -51,23 +58,14 @@ public class RegisterUserRequest {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        RegisterUserRequest that = (RegisterUserRequest) o;
-        return Objects.equals(username, that.username) &&
-                Objects.equals(name, that.name) &&
-                type == that.type;
+        UserDDB userDDB = (UserDDB) o;
+        return Objects.equals(username, userDDB.username) &&
+                Objects.equals(name, userDDB.name) &&
+                type == userDDB.type;
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(username, name, type);
-    }
-
-    @Override
-    public String toString() {
-        return "CreateUserRequest{" +
-                "username='" + username + '\'' +
-                ", name='" + name + '\'' +
-                ", type=" + type +
-                '}';
     }
 }

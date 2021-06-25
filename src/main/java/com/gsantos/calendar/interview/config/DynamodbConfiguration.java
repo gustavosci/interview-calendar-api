@@ -5,8 +5,8 @@
 
 package com.gsantos.calendar.interview.config;
 
-import com.gsantos.calendar.interview.domain.ddb.CalendarDDB;
-import com.gsantos.calendar.interview.domain.ddb.UserDDB;
+import com.gsantos.calendar.interview.model.ddb.CalendarDDB;
+import com.gsantos.calendar.interview.model.ddb.UserDDB;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

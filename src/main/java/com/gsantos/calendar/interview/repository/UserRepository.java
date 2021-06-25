@@ -5,7 +5,7 @@
 
 package com.gsantos.calendar.interview.repository;
 
-import com.gsantos.calendar.interview.domain.ddb.UserDDB;
+import com.gsantos.calendar.interview.model.ddb.UserDDB;
 import org.springframework.stereotype.Repository;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
 import software.amazon.awssdk.enhanced.dynamodb.Key;
