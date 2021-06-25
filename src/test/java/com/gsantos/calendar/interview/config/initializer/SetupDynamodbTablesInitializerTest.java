@@ -27,10 +27,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 class SetupDynamodbTablesInitializerTest {
 
     private final static DockerImageName DYNAMODB_LOCAL_IMAGE = DockerImageName.parse("amazon/dynamodb-local:1.15.0");
-    private final GenericContainer DYNAMODB_CONTAINER = new GenericContainer(DYNAMODB_LOCAL_IMAGE).withExposedPorts(8000);
+    private final static GenericContainer DYNAMODB_CONTAINER = new GenericContainer(DYNAMODB_LOCAL_IMAGE).withExposedPorts(8000);
 
     private final static String CALENDAR_TABLE_NAME = "test-calendar";
-    private final static String USER_TABLE_NAME = "user-calendar";
+    private final static String USER_TABLE_NAME = "test-user";
 
     private DynamoDbClient dynamoDbClient;
     private SetupDynamodbTablesInitializer initializer;

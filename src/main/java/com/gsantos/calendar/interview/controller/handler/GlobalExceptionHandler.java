@@ -3,7 +3,7 @@
  * Author: Gustavo Santos.
  */
 
-package com.gsantos.calendar.interview.controller;
+package com.gsantos.calendar.interview.controller.handler;
 
 import com.gsantos.calendar.interview.domain.response.ErrorResponse;
 import com.gsantos.calendar.interview.exception.ConflictUserException;
