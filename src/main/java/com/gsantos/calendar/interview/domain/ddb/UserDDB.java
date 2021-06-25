@@ -14,6 +14,15 @@ public class UserDDB {
     private String name;
     private UserType type;
 
+    public UserDDB() {
+    }
+
+    public UserDDB(String username, String name, UserType type) {
+        this.username = username;
+        this.name = name;
+        this.type = type;
+    }
+
     @DynamoDbPartitionKey
     public String getUsername() {
         return username;
