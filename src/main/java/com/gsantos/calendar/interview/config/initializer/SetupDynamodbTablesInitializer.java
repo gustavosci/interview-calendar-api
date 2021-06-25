@@ -8,7 +8,6 @@ package com.gsantos.calendar.interview.config.initializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
@@ -21,22 +20,32 @@ import software.amazon.awssdk.services.dynamodb.model.ProvisionedThroughput;
 import software.amazon.awssdk.services.dynamodb.model.ResourceNotFoundException;
 import software.amazon.awssdk.services.dynamodb.model.ScalarAttributeType;
 
+
+/*
+*
+* PS: This is not a "real-life" code. On normal circumstances, the DDB tables would already be created.
+*     However, in order to speed up the challenge, I've decided to run this logic during the startup.
+*
+ */
 @Component
 public class SetupDynamodbTablesInitializer implements InitializingBean {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SetupDynamodbTablesInitializer.class);
 
-    @Autowired
-    private DynamoDbClient dynamoDbClient;
+    private final DynamoDbClient dynamoDbClient;
+    private final String userTableName;
+    private final String calendarTableName;
 
-    @Value("${aws.dynamodb.tables.user}")
-    private String userTableName;
-
-    @Value("${aws.dynamodb.tables.calendar}")
-    private String calendarTableName;
+    public SetupDynamodbTablesInitializer(DynamoDbClient dynamoDbClient,
+                                          @Value("${aws.dynamodb.tables.user}") String userTableName,
+                                          @Value("${aws.dynamodb.tables.calendar}") String calendarTableName) {
+        this.dynamoDbClient = dynamoDbClient;
+        this.userTableName = userTableName;
+        this.calendarTableName = calendarTableName;
+    }
 
     @Override
-    public void afterPropertiesSet() throws Exception {
+    public void afterPropertiesSet() {
         // Create user DDB table if it doesn't exist
         try {
             describeTable(userTableName);
