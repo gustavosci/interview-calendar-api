@@ -21,6 +21,13 @@ public class AvailabilityRequest {
     @NotEmpty
     private List<@Valid DateSlotsRequest> availableSlotsByDate;
 
+    public AvailabilityRequest() {
+    }
+
+    public AvailabilityRequest(@NotEmpty List<@Valid DateSlotsRequest> availableSlotsByDate) {
+        this.availableSlotsByDate = availableSlotsByDate;
+    }
+
     public List<DateSlotsRequest> getAvailableSlotsByDate() {
         return availableSlotsByDate;
     }
@@ -111,6 +118,14 @@ public class AvailabilityRequest {
         @NotNull
         @OClockTime
         private LocalTime endTime;
+
+        public SlotRequest() {
+        }
+
+        public SlotRequest(@NotNull LocalTime startTime, @NotNull LocalTime endTime) {
+            this.startTime = startTime;
+            this.endTime = endTime;
+        }
 
         public LocalTime getStartTime() {
             return startTime;

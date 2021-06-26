@@ -77,10 +77,13 @@ class UserControllerTest {
     Stream<DynamicTest> shouldValidateAllMandatoryFields() {
         return Stream.of(RegisterUserRequestBuilder.randomWithoutUsername(), RegisterUserRequestBuilder.randomWithoutName(), RegisterUserRequestBuilder.randomWithoutType())
                 .map(request -> DynamicTest.dynamicTest(String.format("Should Validate: %s", request), () -> {
+                    // When
                     mockMvc.perform(post("/v1/users")
                             .contentType(MediaType.APPLICATION_JSON_VALUE)
                             .content(objectMapper.writeValueAsBytes(request)))
                             .andExpect(status().isBadRequest());
+
+                    // Then
                     then(registerUserService).should(never()).registerUser(any());
                 }));
     }

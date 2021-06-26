@@ -5,14 +5,14 @@
 
 package com.gsantos.calendar.interview.repository;
 
-import com.gsantos.calendar.interview.model.ddb.UserDDB;
 import com.gsantos.calendar.interview.fixtures.UserDDBBuilder;
+import com.gsantos.calendar.interview.model.ddb.UserDDB;
+import com.gsantos.calendar.interview.util.AbstractDynamodbTest;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.utility.DockerImageName;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
@@ -23,30 +23,20 @@ import software.amazon.awssdk.services.dynamodb.model.KeyType;
 import software.amazon.awssdk.services.dynamodb.model.ProvisionedThroughput;
 import software.amazon.awssdk.services.dynamodb.model.ScalarAttributeType;
 
-import java.net.URI;
-
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Testcontainers
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class UserRepositoryTest {
+class UserRepositoryTest extends AbstractDynamodbTest {
 
-    private final static DockerImageName DYNAMODB_LOCAL_IMAGE = DockerImageName.parse("amazon/dynamodb-local:1.15.0");
-    private final static GenericContainer DYNAMODB_CONTAINER = new GenericContainer(DYNAMODB_LOCAL_IMAGE).withExposedPorts(8000);
     private final static String USER_TABLE_NAME = "test-user";
 
     private UserRepository repository;
 
     @BeforeAll
     public void setup() {
-        DYNAMODB_CONTAINER.start();
-        var dynamodbUrl = String.format("http://%s:%s", DYNAMODB_CONTAINER.getHost(), DYNAMODB_CONTAINER.getFirstMappedPort());
-
-        var dynamoDbClient= DynamoDbClient.builder()
-                .endpointOverride(URI.create(dynamodbUrl))
-                .build();
-
+        var dynamoDbClient= startDynamodb();
         createUserTable(dynamoDbClient);
 
         var dynamodbEnhancedClient = DynamoDbEnhancedClient.builder()
@@ -55,6 +45,11 @@ class UserRepositoryTest {
         var userDDBTable = dynamodbEnhancedClient.table(USER_TABLE_NAME, TableSchema.fromBean(UserDDB.class));
 
         repository = new UserRepository(userDDBTable);
+    }
+
+    @AfterAll
+    public void tearDown() {
+        super.tearDown();
     }
 
     @Test

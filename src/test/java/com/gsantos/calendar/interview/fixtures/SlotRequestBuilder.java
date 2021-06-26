@@ -16,8 +16,9 @@ public final class SlotRequestBuilder {
 
     public static AvailabilityRequest.SlotRequest random() {
         var object = new AvailabilityRequest.SlotRequest();
-        object.setStartTime(LocalTime.now());
-        object.setStartTime(LocalTime.now().plusHours(1));
+        var time = LocalTime.of(LocalTime.now().getHour(), 0, 0);
+        object.setStartTime(time);
+        object.setEndTime(time.plusHours(1));
         return object;
     }
 }

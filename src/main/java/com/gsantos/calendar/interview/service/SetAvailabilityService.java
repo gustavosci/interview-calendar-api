@@ -17,6 +17,10 @@ import com.gsantos.calendar.interview.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Optional;
+
 public abstract class SetAvailabilityService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SetAvailabilityService.class);
@@ -38,25 +42,37 @@ public abstract class SetAvailabilityService {
 
         validateUser(username);
 
-        request.getAvailableSlotsByDate().forEach(slotsByDate -> {
-            var calendar = calendarRepository.getCalendarByUserAndDate(username, slotsByDate.getDate());
-            calendar.ifPresentOrElse(c -> {
-                validateOverlap(c, slotsByDate);
-                var slotsDDB = slotDDBMapper.apply(slotsByDate.getAvailableSlots());
-                c.getAvailableSlots().addAll(slotsDDB);
-                calendarRepository.save(c);
-            },
-            () -> {
-                var calendarDDB = calendarDDBMapper.apply(username, slotsByDate);
-                calendarRepository.save(calendarDDB);
-            });
-        });
+        var storedCalendar = getCalendarsByDateAndValidateOverlapping(username, request);
+        request.getAvailableSlotsByDate().forEach(slotsByDate ->
+                Optional.ofNullable(storedCalendar.get(slotsByDate.getDate()))
+                        .ifPresentOrElse(c -> {
+                                    var slotsDDB = slotDDBMapper.apply(slotsByDate.getAvailableSlots());
+                                    c.getAvailableSlots().addAll(slotsDDB);
+                                    calendarRepository.save(c);
+                                },
+                                () -> {
+                                    var calendarDDB = calendarDDBMapper.apply(username, slotsByDate);
+                                    calendarRepository.save(calendarDDB);
+                                })
+        );
     }
 
     private void validateUser(final String username) {
         var user = userRepository.getUserByUsername(username);
         var isUserValid = user.stream().anyMatch(u -> u.getType().name().equals(getUserType().name()));
         if (!isUserValid) throw new ForbiddenUserException();
+    }
+
+    private HashMap<LocalDate, CalendarDDB> getCalendarsByDateAndValidateOverlapping(final String username, final AvailabilityRequest request) {
+        var storedCalendar = new HashMap<LocalDate, CalendarDDB>();
+        request.getAvailableSlotsByDate().forEach(slotsByDate -> {
+            var calendar = calendarRepository.getCalendarByUserAndDate(username, slotsByDate.getDate());
+            calendar.ifPresent(c -> {
+                validateOverlap(c, slotsByDate);
+                storedCalendar.put(slotsByDate.getDate(), c);
+            });
+        });
+        return storedCalendar;
     }
 
     private void validateOverlap(final CalendarDDB currentCalendar, final AvailabilityRequest.DateSlotsRequest requestedSlots) {
@@ -78,8 +94,11 @@ public abstract class SetAvailabilityService {
         var requestedSlotStart = requestedSlot.getStartTime();
         var requestedSlotEnd = requestedSlot.getEndTime();
 
-        return (requestedSlotStart.isBefore(currentSlotStart) || !requestedSlotStart.isBefore(currentSlotEnd)) &&
-                (!requestedSlotEnd.isAfter(currentSlotStart) || requestedSlotEnd.isAfter(currentSlotEnd));
+        var isRequestedSlotStartValid = requestedSlotStart.isBefore(currentSlotStart) || !requestedSlotStart.isBefore(currentSlotEnd);
+        var isRequestedSlotEndValid = !requestedSlotEnd.isAfter(currentSlotStart) || requestedSlotEnd.isAfter(currentSlotEnd);
+        var isRequestedSlotNotInCurrentSlot = !(requestedSlotStart.isBefore(currentSlotStart) && requestedSlotEnd.isAfter(currentSlotEnd));
+
+        return isRequestedSlotStartValid && isRequestedSlotEndValid && isRequestedSlotNotInCurrentSlot;
     }
 
     protected abstract UserType getUserType();

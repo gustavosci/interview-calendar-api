@@ -23,4 +23,12 @@ public final class UserDDBBuilder {
         object.setType(UserDDB.UserType.values()[nextInt(0, UserType.values().length)]);
         return object;
     }
+
+    public static UserDDB random(UserDDB.UserType userType) {
+        var object = new UserDDB();
+        object.setUsername(randomAlphanumeric(10));
+        object.setName(randomAlphanumeric(10));
+        object.setType(userType);
+        return object;
+    }
 }

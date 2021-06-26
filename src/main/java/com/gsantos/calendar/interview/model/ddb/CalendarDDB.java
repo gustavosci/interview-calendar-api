@@ -21,6 +21,15 @@ public class CalendarDDB {
     private String date;
     private List<SlotDDB> availableSlots;
 
+    public CalendarDDB() {
+    }
+
+    public CalendarDDB(String user, String date, List<SlotDDB> availableSlots) {
+        this.user = user;
+        this.date = date;
+        this.availableSlots = availableSlots;
+    }
+
     @DynamoDbSortKey
     @DynamoDbSecondaryPartitionKey(indexNames = "calendar-index")
     public String getDate() {
@@ -47,6 +56,21 @@ public class CalendarDDB {
 
     public void setAvailableSlots(List<SlotDDB> availableSlots) {
         this.availableSlots = availableSlots;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CalendarDDB that = (CalendarDDB) o;
+        return Objects.equals(user, that.user) &&
+                Objects.equals(date, that.date) &&
+                Objects.equals(availableSlots, that.availableSlots);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(user, date, availableSlots);
     }
 
     @DynamoDbBean
