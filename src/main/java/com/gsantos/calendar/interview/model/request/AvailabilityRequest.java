@@ -5,6 +5,9 @@
 
 package com.gsantos.calendar.interview.model.request;
 
+import com.gsantos.calendar.interview.annotations.OClockTime;
+import com.gsantos.calendar.interview.annotations.SlotPeriodTime;
+
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -51,7 +54,15 @@ public class AvailabilityRequest {
         private LocalDate date;
 
         @NotEmpty
-        private List<@Valid SlotRequest> availableSlots;
+        private List<@Valid @SlotPeriodTime SlotRequest> availableSlots;
+
+        public DateSlotsRequest() {
+        }
+
+        public DateSlotsRequest(LocalDate date, List<SlotRequest> availableSlots) {
+            this.date = date;
+            this.availableSlots = availableSlots;
+        }
 
         public LocalDate getDate() {
             return date;
@@ -93,11 +104,12 @@ public class AvailabilityRequest {
     }
 
     public static class SlotRequest {
-        // TODO: VALIDATE START TIME - 0
         @NotNull
+        @OClockTime
         private LocalTime startTime;
 
         @NotNull
+        @OClockTime
         private LocalTime endTime;
 
         public LocalTime getStartTime() {

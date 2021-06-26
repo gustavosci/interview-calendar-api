@@ -72,20 +72,20 @@ public class SetupDynamodbTablesInitializer implements InitializingBean {
         var request = CreateTableRequest.builder()
                 .attributeDefinitions(
                         AttributeDefinition.builder()
-                                .attributeName("date")
+                                .attributeName("user")
                                 .attributeType(ScalarAttributeType.S)
                                 .build(),
                         AttributeDefinition.builder()
-                                .attributeName("user")
+                                .attributeName("date")
                                 .attributeType(ScalarAttributeType.S)
                                 .build())
                 .keySchema(
                         KeySchemaElement.builder()
-                                .attributeName("date")
+                                .attributeName("user")
                                 .keyType(KeyType.HASH)
                                 .build(),
                         KeySchemaElement.builder()
-                                .attributeName("user")
+                                .attributeName("date")
                                 .keyType(KeyType.RANGE)
                                 .build())
                 .provisionedThroughput(ProvisionedThroughput.builder()
@@ -94,14 +94,14 @@ public class SetupDynamodbTablesInitializer implements InitializingBean {
                         .build())
                 .globalSecondaryIndexes(
                         GlobalSecondaryIndex.builder()
-                                .indexName("user-index")
+                                .indexName("date-index")
                                 .keySchema(
                                         KeySchemaElement.builder()
-                                                .attributeName("user")
+                                                .attributeName("date")
                                                 .keyType(KeyType.HASH)
                                                 .build(),
                                         KeySchemaElement.builder()
-                                                .attributeName("date")
+                                                .attributeName("user")
                                                 .keyType(KeyType.RANGE)
                                                 .build()
                                 )

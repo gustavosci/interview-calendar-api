@@ -7,16 +7,17 @@ package com.gsantos.calendar.interview.exception;
 
 import org.springframework.http.HttpStatus;
 
-// TODO: CREATE ABSTRACT EXCEPTION
-public class UserNotFoundException extends IllegalStateException {
+public abstract class HttpException extends IllegalStateException {
 
     private final HttpStatus status;
 
-    public UserNotFoundException() {
-        this.status = HttpStatus.NOT_FOUND;
+    protected HttpException(HttpStatus status) {
+        this.status = status;
     }
 
     public HttpStatus getStatus() {
         return status;
     }
+
+    public abstract String getDetailedMessage();
 }

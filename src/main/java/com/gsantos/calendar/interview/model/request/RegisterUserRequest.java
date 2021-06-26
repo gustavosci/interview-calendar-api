@@ -13,7 +13,6 @@ import java.util.Objects;
 public class RegisterUserRequest {
 
     @NotNull
-    // TODO: REGEX TO NOT PERMIT SPACES AND LIMIT MAX CARACHTHER
     private String username;
 
     @NotNull

@@ -5,9 +5,9 @@
 
 package com.gsantos.calendar.interview.controller.handler;
 
-import com.gsantos.calendar.interview.exception.UserNotFoundException;
+import com.gsantos.calendar.interview.exception.BodilessHttpException;
+import com.gsantos.calendar.interview.exception.HttpException;
 import com.gsantos.calendar.interview.model.response.ErrorResponse;
-import com.gsantos.calendar.interview.exception.ConflictUserException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -28,13 +28,14 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(ConflictUserException.class)
-    public ResponseEntity handleConflictUserException(final ConflictUserException ex) {
-        return new ResponseEntity<>(ex.getStatus());
+    @ExceptionHandler(HttpException.class)
+    public ResponseEntity<ErrorResponse> handleAnyHttpException(final HttpException ex) {
+        var errorResponse = new ErrorResponse(ex.getDetailedMessage());
+        return new ResponseEntity<>(errorResponse, ex.getStatus());
     }
 
-    @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity handleUserNotFoundException(final UserNotFoundException ex) {
+    @ExceptionHandler(BodilessHttpException.class)
+    public ResponseEntity handleAnyBodilessHttpException(final BodilessHttpException ex) {
         return new ResponseEntity<>(ex.getStatus());
     }
 

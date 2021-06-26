@@ -7,9 +7,9 @@ package com.gsantos.calendar.interview.exception;
 
 import org.springframework.http.HttpStatus;
 
-public class ConflictUserException extends BodilessHttpException {
+public class ForbiddenUserException extends BodilessHttpException {
 
-    public ConflictUserException() {
-        super(HttpStatus.CONFLICT);
+    public ForbiddenUserException() {
+        super(HttpStatus.FORBIDDEN);
     }
 }

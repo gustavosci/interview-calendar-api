@@ -13,15 +13,16 @@ import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSortK
 
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Objects;
 
 @DynamoDbBean
 public class CalendarDDB {
-    private String date;
     private String user;
+    private String date;
     private List<SlotDDB> availableSlots;
 
-    @DynamoDbPartitionKey
-    @DynamoDbSecondarySortKey(indexNames = "user-index")
+    @DynamoDbSortKey
+    @DynamoDbSecondaryPartitionKey(indexNames = "calendar-index")
     public String getDate() {
         return date;
     }
@@ -30,8 +31,8 @@ public class CalendarDDB {
         this.date = date;
     }
 
-    @DynamoDbSortKey
-    @DynamoDbSecondaryPartitionKey(indexNames = "user-index")
+    @DynamoDbPartitionKey
+    @DynamoDbSecondarySortKey(indexNames = "calendar-index")
     public String getUser() {
         return user;
     }
@@ -53,6 +54,14 @@ public class CalendarDDB {
         private LocalTime startTime;
         private LocalTime endTime;
 
+        public SlotDDB() {
+        }
+
+        public SlotDDB(LocalTime startTime, LocalTime endTime) {
+            this.startTime = startTime;
+            this.endTime = endTime;
+        }
+
         public LocalTime getStartTime() {
             return startTime;
         }
@@ -67,6 +76,20 @@ public class CalendarDDB {
 
         public void setEndTime(LocalTime endTime) {
             this.endTime = endTime;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            SlotDDB slotDDB = (SlotDDB) o;
+            return Objects.equals(startTime, slotDDB.startTime) &&
+                    Objects.equals(endTime, slotDDB.endTime);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(startTime, endTime);
         }
     }
 }
