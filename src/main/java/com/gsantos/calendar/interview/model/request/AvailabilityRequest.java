@@ -61,7 +61,7 @@ public class AvailabilityRequest {
         private LocalDate date;
 
         @NotEmpty
-        private List<@Valid @SlotPeriodTime SlotRequest> availableSlots;
+        private List<@Valid @SlotPeriodTime(maxPeriodHour = 1) SlotRequest> availableSlots;
 
         public DateSlotsRequest() {
         }

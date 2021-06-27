@@ -5,7 +5,6 @@
 
 package com.gsantos.calendar.interview.service;
 
-import com.gsantos.calendar.interview.exception.ForbiddenUserException;
 import com.gsantos.calendar.interview.exception.SlotOverlappedException;
 import com.gsantos.calendar.interview.mapping.CalendarDDBMapper;
 import com.gsantos.calendar.interview.mapping.SlotDDBMapper;
@@ -13,7 +12,7 @@ import com.gsantos.calendar.interview.model.ddb.CalendarDDB;
 import com.gsantos.calendar.interview.model.domain.UserType;
 import com.gsantos.calendar.interview.model.request.AvailabilityRequest;
 import com.gsantos.calendar.interview.repository.CalendarRepository;
-import com.gsantos.calendar.interview.repository.UserRepository;
+import com.gsantos.calendar.interview.validator.UserValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,13 +25,13 @@ public abstract class SetAvailabilityService {
     private static final Logger LOGGER = LoggerFactory.getLogger(SetAvailabilityService.class);
 
     private final CalendarRepository calendarRepository;
-    private final UserRepository userRepository;
+    private final UserValidator userValidator;
     private final SlotDDBMapper slotDDBMapper;
     private final CalendarDDBMapper calendarDDBMapper;
 
-    protected SetAvailabilityService(CalendarRepository calendarRepository, UserRepository userRepository) {
+    protected SetAvailabilityService(CalendarRepository calendarRepository, UserValidator userValidator) {
         this.calendarRepository = calendarRepository;
-        this.userRepository = userRepository;
+        this.userValidator = userValidator;
         this.slotDDBMapper = new SlotDDBMapper();
         this.calendarDDBMapper = new CalendarDDBMapper();
     }
@@ -40,7 +39,7 @@ public abstract class SetAvailabilityService {
     public void set(final String username, final AvailabilityRequest request) {
         LOGGER.info("Setting availability. Request: {}", request);
 
-        validateUser(username);
+        userValidator.validate(username, getUserType());
 
         var storedCalendar = getCalendarsByDateAndValidateOverlapping(username, request);
         request.getAvailableSlotsByDate().forEach(slotsByDate ->
@@ -55,12 +54,6 @@ public abstract class SetAvailabilityService {
                                     calendarRepository.save(calendarDDB);
                                 })
         );
-    }
-
-    private void validateUser(final String username) {
-        var user = userRepository.getUserByUsername(username);
-        var isUserValid = user.stream().anyMatch(u -> u.getType().name().equals(getUserType().name()));
-        if (!isUserValid) throw new ForbiddenUserException();
     }
 
     private HashMap<LocalDate, CalendarDDB> getCalendarsByDateAndValidateOverlapping(final String username, final AvailabilityRequest request) {

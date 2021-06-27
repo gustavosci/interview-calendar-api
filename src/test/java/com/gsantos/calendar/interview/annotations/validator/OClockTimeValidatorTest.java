@@ -3,7 +3,7 @@
  * Author: Gustavo Santos.
  */
 
-package com.gsantos.calendar.interview.validator;
+package com.gsantos.calendar.interview.annotations.validator;
 
 import com.gsantos.calendar.interview.annotations.OClockTime;
 import org.junit.jupiter.api.Test;

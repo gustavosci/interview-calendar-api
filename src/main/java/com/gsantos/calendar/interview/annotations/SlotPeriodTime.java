@@ -5,7 +5,7 @@
 
 package com.gsantos.calendar.interview.annotations;
 
-import com.gsantos.calendar.interview.validator.SlotPeriodTimeValidator;
+import com.gsantos.calendar.interview.annotations.validator.SlotPeriodTimeValidator;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
@@ -22,7 +22,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Constraint(validatedBy = SlotPeriodTimeValidator.class)
 @Documented
 public @interface SlotPeriodTime {
-   String message() default "The start time must be earlier than the end time.";
+   String message() default "The slot period is not valid.";
    Class<?>[] groups() default {};
    Class<? extends Payload>[] payload() default {};
+   int maxPeriodHour();
 }

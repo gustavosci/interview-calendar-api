@@ -7,7 +7,7 @@ package com.gsantos.calendar.interview.service;
 
 import com.gsantos.calendar.interview.model.domain.UserType;
 import com.gsantos.calendar.interview.repository.CalendarRepository;
-import com.gsantos.calendar.interview.repository.UserRepository;
+import com.gsantos.calendar.interview.validator.UserValidator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -26,7 +26,7 @@ class SetCandidateAvailabilityTest {
     private CalendarRepository calendarRepository;
 
     @Mock
-    private UserRepository userRepository;
+    private UserValidator userValidator;
 
     @Test
     void shouldGetUserTypeSuccessfully(){

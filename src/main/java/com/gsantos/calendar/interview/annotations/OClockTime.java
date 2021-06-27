@@ -5,7 +5,7 @@
 
 package com.gsantos.calendar.interview.annotations;
 
-import com.gsantos.calendar.interview.validator.OClockTimeValidator;
+import com.gsantos.calendar.interview.annotations.validator.OClockTimeValidator;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;

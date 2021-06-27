@@ -3,7 +3,7 @@
  * Author: Gustavo Santos.
  */
 
-package com.gsantos.calendar.interview.validator;
+package com.gsantos.calendar.interview.annotations.validator;
 
 import com.gsantos.calendar.interview.annotations.SlotPeriodTime;
 import com.gsantos.calendar.interview.model.request.AvailabilityRequest;
@@ -38,6 +38,17 @@ class SlotPeriodTimeValidatorTest {
     }
 
     @Test
+    void shouldValidateMaxPeriodHourReached() {
+        var slot = new AvailabilityRequest.SlotRequest();
+        slot.setStartTime(LocalTime.of(15, 0, 0));
+        slot.setEndTime(LocalTime.of(17, 0, 0));
+        var objectToValidate = new ObjectToValidate(slot);
+
+        var constraintViolations = VALIDATOR.validate(objectToValidate);
+        assertThat(constraintViolations).isNotEmpty();
+    }
+
+    @Test
     void shouldValidateCorrectSlot() {
         var slot = new AvailabilityRequest.SlotRequest();
         slot.setStartTime(LocalTime.of(13, 0, 0));
@@ -49,7 +60,7 @@ class SlotPeriodTimeValidatorTest {
     }
 
     private static class ObjectToValidate {
-        @SlotPeriodTime
+        @SlotPeriodTime(maxPeriodHour = 1)
         private final AvailabilityRequest.SlotRequest slot;
 
         public ObjectToValidate(AvailabilityRequest.SlotRequest slot) {

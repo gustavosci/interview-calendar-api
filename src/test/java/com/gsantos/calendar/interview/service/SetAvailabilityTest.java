@@ -8,14 +8,12 @@ package com.gsantos.calendar.interview.service;
 import com.gsantos.calendar.interview.exception.ForbiddenUserException;
 import com.gsantos.calendar.interview.exception.SlotOverlappedException;
 import com.gsantos.calendar.interview.fixtures.AvailabilityRequestBuilder;
-import com.gsantos.calendar.interview.fixtures.UserDDBBuilder;
 import com.gsantos.calendar.interview.model.ddb.CalendarDDB;
-import com.gsantos.calendar.interview.model.ddb.UserDDB;
 import com.gsantos.calendar.interview.model.domain.UserType;
 import com.gsantos.calendar.interview.model.request.AvailabilityRequest;
 import com.gsantos.calendar.interview.repository.CalendarRepository;
-import com.gsantos.calendar.interview.repository.UserRepository;
 import com.gsantos.calendar.interview.utils.DateConverterUtil;
+import com.gsantos.calendar.interview.validator.UserValidator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
@@ -37,6 +35,7 @@ import static org.apache.commons.lang3.RandomUtils.nextInt;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 
@@ -50,13 +49,12 @@ class SetAvailabilityTest {
     private CalendarRepository calendarRepository;
 
     @Mock
-    private UserRepository userRepository;
+    private UserValidator userValidator;
 
     @Test
     void shouldSetAvailabilitySuccessfully(){
         // Given
         var username = randomAlphanumeric(10);
-        var userDDB = UserDDBBuilder.random(UserDDB.UserType.valueOf(service.getUserType().name()));
 
         var slotRequests1 = List.of(
                 new AvailabilityRequest.SlotRequest(LocalTime.of(8, 0, 0), LocalTime.of(9, 0, 0)),
@@ -77,7 +75,6 @@ class SetAvailabilityTest {
         ));
         var calendarDDB2 = new CalendarDDB(username, DateConverterUtil.toString(dateSlotRequest2.getDate()), slotsDDB2);
 
-        given(userRepository.getUserByUsername(username)).willReturn(Optional.of(userDDB));
         given(calendarRepository.getCalendarByUserAndDate(username, dateSlotRequest1.getDate())).willReturn(Optional.empty());
         given(calendarRepository.getCalendarByUserAndDate(username, dateSlotRequest2.getDate())).willReturn(Optional.of(calendarDDB2));
 
@@ -85,7 +82,7 @@ class SetAvailabilityTest {
         service.set(username, request);
 
         // Then
-        then(userRepository).should().getUserByUsername(any());
+        then(userValidator).should().validate(any(), any());
         then(calendarRepository).should(times(2)).getCalendarByUserAndDate(any(), any());
         then(calendarRepository).should(times(2)).save(any());
     }
@@ -101,7 +98,6 @@ class SetAvailabilityTest {
         ).map(overlappedSlot -> DynamicTest.dynamicTest(String.format("Should throw error when there are overlapped slots: %s", overlappedSlot), () -> {
             // Given
             var username = randomAlphanumeric(10);
-            var userDDB = UserDDBBuilder.random(UserDDB.UserType.valueOf(service.getUserType().name()));
 
             var slotRequests1 = List.of(
                     new AvailabilityRequest.SlotRequest(LocalTime.of(8, 0, 0), LocalTime.of(9, 0, 0)),
@@ -120,7 +116,6 @@ class SetAvailabilityTest {
             var slotsDDB2 = List.of(overlappedSlot);
             var calendarDDB2 = new CalendarDDB(username, DateConverterUtil.toString(dateSlotRequest2.getDate()), slotsDDB2);
 
-            given(userRepository.getUserByUsername(username)).willReturn(Optional.of(userDDB));
             given(calendarRepository.getCalendarByUserAndDate(username, dateSlotRequest1.getDate())).willReturn(Optional.empty());
             given(calendarRepository.getCalendarByUserAndDate(username, dateSlotRequest2.getDate())).willReturn(Optional.of(calendarDDB2));
 
@@ -133,37 +128,18 @@ class SetAvailabilityTest {
     }
 
     @Test
-    void shouldThrowErrorWhenUserDoesNotExist(){
+    void shouldThrowErrorWhenUserIsInvalid(){
         // Given
         var username = randomAlphanumeric(10);
         var request = AvailabilityRequestBuilder.random();
 
-        given(userRepository.getUserByUsername(username)).willReturn(Optional.empty());
+        doThrow(new ForbiddenUserException()).when(userValidator).validate(any(), any());
 
         // When
         Assertions.assertThrows(ForbiddenUserException.class, () -> service.set(username, request));
 
         // Then
-        then(userRepository).should().getUserByUsername(any());
-        then(calendarRepository).should(never()).save(any());
-        then(calendarRepository).should(never()).getCalendarByUserAndDate(any(), any());
-    }
-
-    @Test
-    void shouldThrowErrorWhenUserIsNotExpectedType(){
-        // Given
-        var username = randomAlphanumeric(10);
-        var request = AvailabilityRequestBuilder.random();
-        var userType = service.getUserType() == UserType.CANDIDATE ? UserDDB.UserType.INTERVIEWER : UserDDB.UserType.CANDIDATE;
-        var userDDB = UserDDBBuilder.random(userType);
-
-        given(userRepository.getUserByUsername(username)).willReturn(Optional.of(userDDB));
-
-        // When
-        Assertions.assertThrows(ForbiddenUserException.class, () -> service.set(username, request));
-
-        // Then
-        then(userRepository).should().getUserByUsername(any());
+        then(userValidator).should().validate(any(), any());
         then(calendarRepository).should(never()).save(any());
         then(calendarRepository).should(never()).getCalendarByUserAndDate(any(), any());
     }
@@ -172,8 +148,8 @@ class SetAvailabilityTest {
 
         private final UserType userType;
 
-        public SetAvailabilityImplService(CalendarRepository calendarRepository, UserRepository userRepository) {
-            super(calendarRepository, userRepository);
+        public SetAvailabilityImplService(CalendarRepository calendarRepository, UserValidator userValidator) {
+            super(calendarRepository, userValidator);
             this.userType = UserType.values()[nextInt(0, UserType.values().length)];
         }
 
