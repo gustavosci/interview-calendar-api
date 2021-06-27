@@ -6,7 +6,7 @@
 package com.gsantos.calendar.interview.controller;
 
 import com.gsantos.calendar.interview.model.request.AvailabilityRequest;
-import com.gsantos.calendar.interview.model.response.CandidateAvailableSlotsResponse;
+import com.gsantos.calendar.interview.model.response.CandidateAvailabilityResponse;
 import com.gsantos.calendar.interview.model.response.ErrorResponse;
 import com.gsantos.calendar.interview.service.GetCandidateAvailabilityService;
 import com.gsantos.calendar.interview.service.SetCandidateAvailabilityService;
@@ -94,9 +94,9 @@ public class CandidateController {
             }
     )
     @ResponseStatus(HttpStatus.OK)
-    public CandidateAvailableSlotsResponse getAvailableSlots(@RequestHeader("username") final String username,
-                                                             @RequestParam("interviewers") @NotEmpty final List<String> interviewers,
-                                                             @RequestParam(name = "daysInFuture", required = false, defaultValue = "7") final Integer daysInFuture) {
+    public CandidateAvailabilityResponse getAvailableSlots(@RequestHeader("username") final String username,
+                                                           @RequestParam("interviewers") @NotEmpty final List<String> interviewers,
+                                                           @RequestParam(name = "daysInFuture", required = false, defaultValue = "7") final Integer daysInFuture) {
         return getCandidateAvailabilityService.get(username, interviewers, daysInFuture);
     }
 }

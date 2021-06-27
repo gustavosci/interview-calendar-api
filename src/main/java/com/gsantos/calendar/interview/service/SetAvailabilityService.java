@@ -29,11 +29,12 @@ public abstract class SetAvailabilityService {
     private final SlotDDBMapper slotDDBMapper;
     private final CalendarDDBMapper calendarDDBMapper;
 
-    protected SetAvailabilityService(CalendarRepository calendarRepository, UserValidator userValidator) {
+    protected SetAvailabilityService(CalendarRepository calendarRepository, UserValidator userValidator,
+                                  SlotDDBMapper slotDDBMapper, CalendarDDBMapper calendarDDBMapper) {
         this.calendarRepository = calendarRepository;
         this.userValidator = userValidator;
-        this.slotDDBMapper = new SlotDDBMapper();
-        this.calendarDDBMapper = new CalendarDDBMapper();
+        this.slotDDBMapper = slotDDBMapper;
+        this.calendarDDBMapper = calendarDDBMapper;
     }
 
     public void set(final String username, final AvailabilityRequest request) {

@@ -5,6 +5,8 @@
 
 package com.gsantos.calendar.interview.service;
 
+import com.gsantos.calendar.interview.mapping.CalendarDDBMapper;
+import com.gsantos.calendar.interview.mapping.SlotDDBMapper;
 import com.gsantos.calendar.interview.model.domain.UserType;
 import com.gsantos.calendar.interview.repository.CalendarRepository;
 import com.gsantos.calendar.interview.validator.UserValidator;
@@ -27,6 +29,12 @@ class SetInterviewerAvailabilityTest {
 
     @Mock
     private UserValidator userValidator;
+
+    @Mock
+    private SlotDDBMapper slotDDBMapper;
+
+    @Mock
+    private CalendarDDBMapper calendarDDBMapper;
 
     @Test
     void shouldGetUserTypeSuccessfully(){

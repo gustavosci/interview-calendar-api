@@ -19,14 +19,15 @@ public class RegisterUserService {
     private static final Logger LOGGER = LoggerFactory.getLogger(RegisterUserService.class);
 
     private final UserRepository userRepository;
-    private final UserDDBMapper userDDBMapper = new UserDDBMapper();
+    private final UserDDBMapper userDDBMapper;
 
-    public RegisterUserService(UserRepository userRepository) {
+    public RegisterUserService(UserRepository userRepository, UserDDBMapper userDDBMapper) {
         this.userRepository = userRepository;
+        this.userDDBMapper = userDDBMapper;
     }
 
     public void registerUser(final RegisterUserRequest request) {
-        LOGGER.debug("Creating user {}", request);
+        LOGGER.info("Creating user {}", request);
 
         if (exists(request.getUsername())) throw new ConflictUserException();
 

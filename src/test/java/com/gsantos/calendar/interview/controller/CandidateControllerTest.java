@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gsantos.calendar.interview.exception.ForbiddenUserException;
 import com.gsantos.calendar.interview.exception.SlotOverlappedException;
 import com.gsantos.calendar.interview.fixtures.AvailabilityRequestBuilder;
+import com.gsantos.calendar.interview.service.GetCandidateAvailabilityService;
 import com.gsantos.calendar.interview.service.SetCandidateAvailabilityService;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
@@ -47,6 +48,9 @@ class CandidateControllerTest {
 
     @MockBean
     private SetCandidateAvailabilityService setCandidateAvailabilityService;
+
+    @MockBean
+    private GetCandidateAvailabilityService getCandidateAvailabilityService;
 
     @Test
     void shouldSetInterviewerAvailabilitySuccessfully() throws Exception {

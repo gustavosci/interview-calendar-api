@@ -5,6 +5,8 @@
 
 package com.gsantos.calendar.interview.service;
 
+import com.gsantos.calendar.interview.mapping.CalendarDDBMapper;
+import com.gsantos.calendar.interview.mapping.SlotDDBMapper;
 import com.gsantos.calendar.interview.model.domain.UserType;
 import com.gsantos.calendar.interview.repository.CalendarRepository;
 import com.gsantos.calendar.interview.validator.UserValidator;
@@ -13,8 +15,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class SetCandidateAvailabilityService extends SetAvailabilityService {
 
-    public SetCandidateAvailabilityService(CalendarRepository calendarRepository, UserValidator userValidator) {
-        super(calendarRepository, userValidator);
+    public SetCandidateAvailabilityService(CalendarRepository calendarRepository, UserValidator userValidator,
+                                           SlotDDBMapper slotDDBMapper, CalendarDDBMapper calendarDDBMapper) {
+        super(calendarRepository, userValidator, slotDDBMapper, calendarDDBMapper);
     }
 
     @Override

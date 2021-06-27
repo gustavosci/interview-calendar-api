@@ -8,12 +8,12 @@ package com.gsantos.calendar.interview.model.domain;
 import java.time.LocalDate;
 import java.util.List;
 
-public class DateSlots {
+public class DateAvailability {
 
     private final LocalDate date;
     private final List<Slot> slots;
 
-    public DateSlots(LocalDate date, List<Slot> slots) {
+    public DateAvailability(LocalDate date, List<Slot> slots) {
         this.date = date;
         this.slots = slots;
     }

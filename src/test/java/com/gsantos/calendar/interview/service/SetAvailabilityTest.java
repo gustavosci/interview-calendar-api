@@ -8,6 +8,8 @@ package com.gsantos.calendar.interview.service;
 import com.gsantos.calendar.interview.exception.ForbiddenUserException;
 import com.gsantos.calendar.interview.exception.SlotOverlappedException;
 import com.gsantos.calendar.interview.fixtures.AvailabilityRequestBuilder;
+import com.gsantos.calendar.interview.mapping.CalendarDDBMapper;
+import com.gsantos.calendar.interview.mapping.SlotDDBMapper;
 import com.gsantos.calendar.interview.model.ddb.CalendarDDB;
 import com.gsantos.calendar.interview.model.domain.UserType;
 import com.gsantos.calendar.interview.model.request.AvailabilityRequest;
@@ -21,6 +23,7 @@ import org.junit.jupiter.api.TestFactory;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
@@ -50,6 +53,12 @@ class SetAvailabilityTest {
 
     @Mock
     private UserValidator userValidator;
+
+    @Spy
+    private SlotDDBMapper slotDDBMapper = new SlotDDBMapper();
+
+    @Spy
+    private CalendarDDBMapper calendarDDBMapper = new CalendarDDBMapper();;
 
     @Test
     void shouldSetAvailabilitySuccessfully(){
@@ -145,11 +154,11 @@ class SetAvailabilityTest {
     }
 
     private static class SetAvailabilityImplService extends SetAvailabilityService {
-
         private final UserType userType;
 
-        public SetAvailabilityImplService(CalendarRepository calendarRepository, UserValidator userValidator) {
-            super(calendarRepository, userValidator);
+        public SetAvailabilityImplService(CalendarRepository calendarRepository, UserValidator userValidator,
+                                          SlotDDBMapper slotDDBMapper, CalendarDDBMapper calendarDDBMapper) {
+            super(calendarRepository, userValidator, slotDDBMapper, calendarDDBMapper);
             this.userType = UserType.values()[nextInt(0, UserType.values().length)];
         }
 

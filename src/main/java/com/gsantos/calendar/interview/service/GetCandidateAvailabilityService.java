@@ -5,12 +5,12 @@
 
 package com.gsantos.calendar.interview.service;
 
-import com.gsantos.calendar.interview.mapping.CandidateAvailableSlotsResponseMapper;
+import com.gsantos.calendar.interview.mapping.CandidateAvailabilityResponseMapper;
 import com.gsantos.calendar.interview.model.ddb.CalendarDDB;
-import com.gsantos.calendar.interview.model.domain.DateSlots;
+import com.gsantos.calendar.interview.model.domain.DateAvailability;
 import com.gsantos.calendar.interview.model.domain.Slot;
 import com.gsantos.calendar.interview.model.domain.UserType;
-import com.gsantos.calendar.interview.model.response.CandidateAvailableSlotsResponse;
+import com.gsantos.calendar.interview.model.response.CandidateAvailabilityResponse;
 import com.gsantos.calendar.interview.repository.CalendarRepository;
 import com.gsantos.calendar.interview.utils.DateConverterUtil;
 import com.gsantos.calendar.interview.validator.UserValidator;
@@ -19,13 +19,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
@@ -38,15 +36,16 @@ public class GetCandidateAvailabilityService {
 
     private final UserValidator userValidator;
     private final CalendarRepository calendarRepository;
-    private final CandidateAvailableSlotsResponseMapper candidateAvailableSlotsResponseMapper;
+    private final CandidateAvailabilityResponseMapper candidateAvailabilityResponseMapper;
 
-    public GetCandidateAvailabilityService(UserValidator userValidator, CalendarRepository calendarRepository) {
+    public GetCandidateAvailabilityService(UserValidator userValidator, CalendarRepository calendarRepository,
+                                           CandidateAvailabilityResponseMapper candidateAvailabilityResponseMapper) {
         this.userValidator = userValidator;
         this.calendarRepository = calendarRepository;
-        this.candidateAvailableSlotsResponseMapper = new CandidateAvailableSlotsResponseMapper();
+        this.candidateAvailabilityResponseMapper = candidateAvailabilityResponseMapper;
     }
 
-    public CandidateAvailableSlotsResponse get(final String username, final List<String> interviewers, final int daysInFuture) {
+    public CandidateAvailabilityResponse get(final String username, final List<String> interviewers, final int daysInFuture) {
         LOGGER.info("Getting candidate availability. User: {} - Interviewers: {}", username, interviewers);
 
         userValidator.validate(username, UserType.CANDIDATE);
@@ -58,43 +57,44 @@ public class GetCandidateAvailabilityService {
                 .collect(toMap(CalendarDDB::getDate, Function.identity()));
         var interviewersAvailability = getInterviewersAvailabilityByDate(interviewers, candidateAvailability.keySet());
 
-        var matchesByInterviewer = new HashMap<String, List<DateSlots>>();
-        interviewers.forEach(i -> {
-            var interviewerMatches = Optional.ofNullable(interviewersAvailability.get(i))
-                    .map(iAvailability -> getMatchedSlotsByDate(iAvailability, candidateAvailability))
-                    .orElseGet(List::of);
-            matchesByInterviewer.put(i, interviewerMatches);
-        });
+        var matchesByInterviewer = interviewers
+                .stream()
+                .collect(toMap(
+                        Function.identity(),
+                        interviewer -> Optional.ofNullable(interviewersAvailability.get(interviewer))
+                                .map(iAvailability -> getMatchedSlotsByDate(iAvailability, candidateAvailability))
+                                .orElseGet(List::of)
+                        )
+                );
 
-        return candidateAvailableSlotsResponseMapper.apply(username, matchesByInterviewer);
+        return candidateAvailabilityResponseMapper.apply(username, matchesByInterviewer);
     }
 
     private Map<String, List<CalendarDDB>> getInterviewersAvailabilityByDate(final List<String> interviewers, final Set<String> candidateAvailabilityDates) {
-        return candidateAvailabilityDates.stream().flatMap(candidateAvailabilityDate -> {
-            var cDate = DateConverterUtil.toLocalDate(candidateAvailabilityDate);
-            return interviewers.stream()
-                    .map(i -> calendarRepository.getCalendarByUserAndDate(i, cDate));
-        }).filter(Optional::isPresent)
+        return candidateAvailabilityDates.stream()
+                .flatMap(candidateAvailabilityDate -> {
+                    var cDate = DateConverterUtil.toLocalDate(candidateAvailabilityDate);
+                    return interviewers.stream().map(i -> calendarRepository.getCalendarByUserAndDate(i, cDate));
+                })
+                .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(groupingBy(CalendarDDB::getUser));
     }
 
-    private List<DateSlots> getMatchedSlotsByDate(final List<CalendarDDB> interviewerAvailability,
-                                                  final Map<String, CalendarDDB> candidateAvailability) {
+    private List<DateAvailability> getMatchedSlotsByDate(final List<CalendarDDB> interviewerAvailability,
+                                                         final Map<String, CalendarDDB> candidateAvailability) {
         return interviewerAvailability.stream()
                 .map(cInterviewer -> {
                     var candidateAvailabilityOnDate = candidateAvailability.get(cInterviewer.getDate());
-                    var matchedSlots = matchedSlots(candidateAvailabilityOnDate.getAvailableSlots(), cInterviewer.getAvailableSlots())
-                            .stream()
-                            .map(ms -> new Slot(ms.getStartTime(), ms.getEndTime()))
-                            .collect(toList());
-                    return new DateSlots(DateConverterUtil.toLocalDate(cInterviewer.getDate()), matchedSlots);
+                    var matchedSlots = matchedSlots(candidateAvailabilityOnDate.getAvailableSlots(), cInterviewer.getAvailableSlots());
+                    return new DateAvailability(DateConverterUtil.toLocalDate(cInterviewer.getDate()), matchedSlots);
                 }).collect(toList());
     }
 
-    private List<CalendarDDB.SlotDDB> matchedSlots(final List<CalendarDDB.SlotDDB> first, final List<CalendarDDB.SlotDDB> second) {
+    private List<Slot> matchedSlots(final List<CalendarDDB.SlotDDB> first, final List<CalendarDDB.SlotDDB> second) {
         return first.stream()
                 .filter(f -> second.stream().anyMatch(f::equals))
-                .collect(Collectors.toList());
+                .map(ms -> new Slot(ms.getStartTime(), ms.getEndTime()))
+                .collect(toList());
     }
 }

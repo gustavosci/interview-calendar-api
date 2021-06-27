@@ -7,9 +7,11 @@ package com.gsantos.calendar.interview.mapping;
 
 import com.gsantos.calendar.interview.model.ddb.UserDDB;
 import com.gsantos.calendar.interview.model.request.RegisterUserRequest;
+import org.springframework.stereotype.Component;
 
 import java.util.function.Function;
 
+@Component
 public class UserDDBMapper implements Function<RegisterUserRequest, UserDDB> {
 
     @Override

@@ -8,9 +8,11 @@ package com.gsantos.calendar.interview.mapping;
 import com.gsantos.calendar.interview.model.ddb.CalendarDDB;
 import com.gsantos.calendar.interview.model.request.AvailabilityRequest;
 import com.gsantos.calendar.interview.utils.DateConverterUtil;
+import org.springframework.stereotype.Component;
 
 import java.util.function.BiFunction;
 
+@Component
 public class CalendarDDBMapper implements BiFunction<String, AvailabilityRequest.DateSlotsRequest, CalendarDDB> {
 
     @Override
