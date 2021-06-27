@@ -6,7 +6,7 @@
 package com.gsantos.calendar.interview.validator;
 
 import com.gsantos.calendar.interview.exception.ForbiddenUserException;
-import com.gsantos.calendar.interview.exception.IncorrectUserTypeException;
+import com.gsantos.calendar.interview.exception.UnexpectedUserTypeException;
 import com.gsantos.calendar.interview.model.ddb.UserDDB;
 import com.gsantos.calendar.interview.model.domain.UserType;
 import com.gsantos.calendar.interview.repository.UserRepository;
@@ -20,6 +20,7 @@ import java.util.Optional;
 public class UserValidator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserValidator.class);
+
     private final UserRepository userRepository;
 
     public UserValidator(UserRepository userRepository) {
@@ -32,13 +33,12 @@ public class UserValidator {
         if (!isUserValid) throw new ForbiddenUserException();
     }
 
-    // TODO: TEST
-    public void validateUserType(final String username, final UserType type) {
+    public void validateUserType(final String username, final UserType expectedType) {
         getUserFromDDB(username).ifPresent(u -> {
-            if (!u.getType().name().equals(type.name())) {
-                var message = String.format("It's expected for the user %s to be %s", username, type);
+            if (!u.getType().name().equals(expectedType.name())) {
+                var message = String.format("It's expected for the user %s to be %s", username, expectedType);
                 LOGGER.warn(message);
-                throw new IncorrectUserTypeException(message);
+                throw new UnexpectedUserTypeException(message);
             }
         });
     }

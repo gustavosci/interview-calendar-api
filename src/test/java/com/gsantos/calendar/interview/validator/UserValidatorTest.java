@@ -6,6 +6,7 @@
 package com.gsantos.calendar.interview.validator;
 
 import com.gsantos.calendar.interview.exception.ForbiddenUserException;
+import com.gsantos.calendar.interview.exception.UnexpectedUserTypeException;
 import com.gsantos.calendar.interview.fixtures.UserDDBBuilder;
 import com.gsantos.calendar.interview.model.ddb.UserDDB;
 import com.gsantos.calendar.interview.model.domain.UserType;
@@ -73,6 +74,37 @@ class UserValidatorTest {
 
         // When
         Assertions.assertThrows(ForbiddenUserException.class, () -> validator.validate(username, userType));
+
+        // Then
+        then(userRepository).should().getUserByUsername(any());
+    }
+
+    @Test
+    void shouldValidateUserTypeWhenIsDifferentFromExpected(){
+        // Given
+        var userDDB = UserDDBBuilder.random();
+        var username = randomAlphanumeric(10);
+        var expectedUserType = userDDB.getType() == UserDDB.UserType.CANDIDATE ? UserType.INTERVIEWER : UserType.CANDIDATE;
+
+        given(userRepository.getUserByUsername(username)).willReturn(Optional.of(userDDB));
+
+        // When
+        Assertions.assertThrows(UnexpectedUserTypeException.class, () -> validator.validateUserType(username, expectedUserType));
+
+        // Then
+        then(userRepository).should().getUserByUsername(any());
+    }
+
+    @Test
+    void shouldValidateUserTypeWhenIsTheExpected(){
+        // Given
+        var userDDB = UserDDBBuilder.random();
+        var username = randomAlphanumeric(10);
+
+        given(userRepository.getUserByUsername(username)).willReturn(Optional.of(userDDB));
+
+        // When
+        validator.validateUserType(username, UserType.valueOf(userDDB.getType().name()));
 
         // Then
         then(userRepository).should().getUserByUsername(any());

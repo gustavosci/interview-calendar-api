@@ -9,7 +9,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 public class DateAvailability {
-
     private final LocalDate date;
     private final List<Slot> slots;
 

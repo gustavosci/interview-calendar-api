@@ -7,11 +7,11 @@ package com.gsantos.calendar.interview.exception;
 
 import org.springframework.http.HttpStatus;
 
-public class IncorrectUserTypeException extends HttpException {
+public class UnexpectedUserTypeException extends HttpException {
 
     private final String message;
 
-    public IncorrectUserTypeException(final String message) {
+    public UnexpectedUserTypeException(final String message) {
         super(HttpStatus.BAD_REQUEST);
         this.message = message;
     }

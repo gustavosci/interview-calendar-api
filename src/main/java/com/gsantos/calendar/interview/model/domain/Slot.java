@@ -8,7 +8,6 @@ package com.gsantos.calendar.interview.model.domain;
 import java.time.LocalTime;
 
 public class Slot {
-
     private final LocalTime startTime;
     private final LocalTime endTime;
 
