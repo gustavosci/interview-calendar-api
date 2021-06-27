@@ -17,10 +17,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
-class SetInterviewerAvailabilityTest {
+class SetCandidateAvailabilityTest {
 
     @InjectMocks
-    private SetInterviewerAvailabilityService service;
+    private SetCandidateAvailabilityService service;
 
     @Mock
     private CalendarRepository calendarRepository;
@@ -34,11 +34,11 @@ class SetInterviewerAvailabilityTest {
         var userType = service.getUserType();
 
         // Then
-        assertThat(userType).isEqualTo(UserType.INTERVIEWER);
+        assertThat(userType).isEqualTo(UserType.CANDIDATE);
     }
 
     @Test
     void shouldExtendsSetAvailabilityService() {
-        assertThat(SetAvailabilityService.class.isAssignableFrom(SetInterviewerAvailabilityService.class)).isTrue();
+        assertThat(SetAvailabilityService.class.isAssignableFrom(SetCandidateAvailabilityService.class)).isTrue();
     }
 }

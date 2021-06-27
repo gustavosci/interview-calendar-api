@@ -5,7 +5,7 @@
 
 package com.gsantos.calendar.interview.config.initializer;
 
-import com.gsantos.calendar.interview.util.AbstractDynamodbTest;
+import com.gsantos.calendar.interview.support.AbstractDynamodbTest;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;

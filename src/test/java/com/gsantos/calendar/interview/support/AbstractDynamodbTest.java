@@ -3,7 +3,7 @@
  * Author: Gustavo Santos.
  */
 
-package com.gsantos.calendar.interview.util;
+package com.gsantos.calendar.interview.support;
 
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.utility.DockerImageName;
