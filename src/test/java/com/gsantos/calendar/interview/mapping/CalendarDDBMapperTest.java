@@ -7,17 +7,15 @@ package com.gsantos.calendar.interview.mapping;
 
 
 import com.gsantos.calendar.interview.model.request.AvailabilityRequest;
+import com.gsantos.calendar.interview.utils.DateConverterUtil;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class CalendarDDBMapperTest {
-
-    private static final DateTimeFormatter LOCAL_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     private final CalendarDDBMapper mapper = new CalendarDDBMapper();
 
@@ -31,7 +29,7 @@ class CalendarDDBMapperTest {
         var response = mapper.apply(username, dateSlotsRequest);
 
         // Then
-        assertThat(response.getDate()).isEqualTo(dateSlotsRequest.getDate().format(LOCAL_DATE_FORMATTER));
+        assertThat(response.getDate()).isEqualTo(DateConverterUtil.toString(dateSlotsRequest.getDate()));
         assertThat(response.getUser()).isEqualTo(username);
         assertThat(response.getAvailableSlots()).isEmpty();
     }

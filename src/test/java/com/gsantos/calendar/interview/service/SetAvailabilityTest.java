@@ -15,6 +15,7 @@ import com.gsantos.calendar.interview.model.domain.UserType;
 import com.gsantos.calendar.interview.model.request.AvailabilityRequest;
 import com.gsantos.calendar.interview.repository.CalendarRepository;
 import com.gsantos.calendar.interview.repository.UserRepository;
+import com.gsantos.calendar.interview.utils.DateConverterUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
@@ -26,7 +27,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -42,8 +42,6 @@ import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
 class SetAvailabilityTest {
-
-    private static final DateTimeFormatter LOCAL_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     @InjectMocks
     private SetAvailabilityImplService service;
@@ -77,7 +75,7 @@ class SetAvailabilityTest {
         var slotsDDB2 = new ArrayList<>(List.of(
                 new CalendarDDB.SlotDDB(LocalTime.of(15, 0, 0), LocalTime.of(19, 0, 0))
         ));
-        var calendarDDB2 = new CalendarDDB(username, dateSlotRequest2.getDate().format(LOCAL_DATE_FORMATTER), slotsDDB2);
+        var calendarDDB2 = new CalendarDDB(username, DateConverterUtil.toString(dateSlotRequest2.getDate()), slotsDDB2);
 
         given(userRepository.getUserByUsername(username)).willReturn(Optional.of(userDDB));
         given(calendarRepository.getCalendarByUserAndDate(username, dateSlotRequest1.getDate())).willReturn(Optional.empty());
@@ -120,7 +118,7 @@ class SetAvailabilityTest {
             var request = new AvailabilityRequest(List.of(dateSlotRequest1, dateSlotRequest2));
 
             var slotsDDB2 = List.of(overlappedSlot);
-            var calendarDDB2 = new CalendarDDB(username, dateSlotRequest2.getDate().format(LOCAL_DATE_FORMATTER), slotsDDB2);
+            var calendarDDB2 = new CalendarDDB(username, DateConverterUtil.toString(dateSlotRequest2.getDate()), slotsDDB2);
 
             given(userRepository.getUserByUsername(username)).willReturn(Optional.of(userDDB));
             given(calendarRepository.getCalendarByUserAndDate(username, dateSlotRequest1.getDate())).willReturn(Optional.empty());

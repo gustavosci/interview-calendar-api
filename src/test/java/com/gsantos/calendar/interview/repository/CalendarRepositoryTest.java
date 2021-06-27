@@ -8,6 +8,7 @@ package com.gsantos.calendar.interview.repository;
 import com.gsantos.calendar.interview.fixtures.CalendarDDBBuilder;
 import com.gsantos.calendar.interview.model.ddb.CalendarDDB;
 import com.gsantos.calendar.interview.support.AbstractDynamodbTest;
+import com.gsantos.calendar.interview.utils.DateConverterUtil;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -27,7 +28,6 @@ import software.amazon.awssdk.services.dynamodb.model.ProvisionedThroughput;
 import software.amazon.awssdk.services.dynamodb.model.ScalarAttributeType;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -36,7 +36,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class CalendarRepositoryTest extends AbstractDynamodbTest {
 
-    private static final DateTimeFormatter LOCAL_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private final static String CALENDAR_TABLE_NAME = "test-calendar";
 
     private CalendarRepository repository;
@@ -81,7 +80,7 @@ class CalendarRepositoryTest extends AbstractDynamodbTest {
         repository.save(calendarDDB);
 
         // Then
-        var storedCalendar = repository.getCalendarByUserAndDate(calendarDDB.getUser(), LocalDate.parse(calendarDDB.getDate(), LOCAL_DATE_FORMATTER));
+        var storedCalendar = repository.getCalendarByUserAndDate(calendarDDB.getUser(), DateConverterUtil.toLocalDate(calendarDDB.getDate()));
         assertThat(storedCalendar)
                 .isPresent()
                 .contains(calendarDDB);
