@@ -92,27 +92,6 @@ public class SetupDynamodbTablesInitializer implements InitializingBean {
                         .readCapacityUnits(10L)
                         .writeCapacityUnits(10L)
                         .build())
-                .globalSecondaryIndexes(
-                        GlobalSecondaryIndex.builder()
-                                .indexName("date-index")
-                                .keySchema(
-                                        KeySchemaElement.builder()
-                                                .attributeName("date")
-                                                .keyType(KeyType.HASH)
-                                                .build(),
-                                        KeySchemaElement.builder()
-                                                .attributeName("user")
-                                                .keyType(KeyType.RANGE)
-                                                .build()
-                                )
-                                .provisionedThroughput(ProvisionedThroughput.builder()
-                                        .readCapacityUnits(10L)
-                                        .writeCapacityUnits(10L)
-                                        .build())
-                                .projection(Projection.builder().projectionType(ProjectionType.ALL).build())
-                                .build()
-
-                )
                 .tableName(calendarTableName)
                 .build();
 

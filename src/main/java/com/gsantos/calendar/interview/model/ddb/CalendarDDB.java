@@ -31,7 +31,6 @@ public class CalendarDDB {
     }
 
     @DynamoDbSortKey
-    @DynamoDbSecondaryPartitionKey(indexNames = "calendar-index")
     public String getDate() {
         return date;
     }
@@ -41,7 +40,6 @@ public class CalendarDDB {
     }
 
     @DynamoDbPartitionKey
-    @DynamoDbSecondarySortKey(indexNames = "calendar-index")
     public String getUser() {
         return user;
     }
