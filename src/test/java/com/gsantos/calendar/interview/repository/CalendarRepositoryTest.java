@@ -28,6 +28,7 @@ import software.amazon.awssdk.services.dynamodb.model.ProvisionedThroughput;
 import software.amazon.awssdk.services.dynamodb.model.ScalarAttributeType;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -84,6 +85,29 @@ class CalendarRepositoryTest extends AbstractDynamodbTest {
         assertThat(storedCalendar)
                 .isPresent()
                 .contains(calendarDDB);
+    }
+
+    @Test
+    void shouldGetCalendarsByUserAndRangeOfDates() {
+        // Given
+        var username = randomAlphanumeric(10);
+        var from = LocalDate.now();
+        var to = LocalDate.now().plusDays(5);
+
+        var calendar1 = new CalendarDDB(username, DateConverterUtil.toString(from), List.of());
+        var calendar2 = new CalendarDDB(username, DateConverterUtil.toString(to), List.of());
+        var calendar3 = new CalendarDDB(username, DateConverterUtil.toString(to.plusDays(1)), List.of());
+
+        repository.save(calendar1);
+        repository.save(calendar2);
+        repository.save(calendar3);
+
+        // When
+        var response = repository.getUserAvailability(username, from, to);
+
+        // Then
+        assertThat(response).hasSize(2);
+        assertThat(response.toArray()).containsExactlyInAnyOrder(List.of(calendar1, calendar2).toArray());
     }
 
     private void createCalendarTable(final DynamoDbClient dynamoDbClient) {

@@ -35,7 +35,8 @@ public class CandidateController {
     private final SetCandidateAvailabilityService setCandidateAvailabilityService;
     private final GetCandidateAvailabilityService getCandidateAvailabilityService;
 
-    public CandidateController(SetCandidateAvailabilityService setCandidateAvailabilityService, GetCandidateAvailabilityService getCandidateAvailabilityService) {
+    public CandidateController(SetCandidateAvailabilityService setCandidateAvailabilityService,
+                               GetCandidateAvailabilityService getCandidateAvailabilityService) {
         this.setCandidateAvailabilityService = setCandidateAvailabilityService;
         this.getCandidateAvailabilityService = getCandidateAvailabilityService;
     }
@@ -69,7 +70,7 @@ public class CandidateController {
         setCandidateAvailabilityService.set(username, request);
     }
 
-    @GetMapping(value = "/available-slots", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/availability", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation("Get the candidate's available slots filtering by interviewer")
     @ApiResponses(
             value = {

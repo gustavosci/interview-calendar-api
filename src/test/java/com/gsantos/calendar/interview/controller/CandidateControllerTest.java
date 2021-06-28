@@ -9,6 +9,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gsantos.calendar.interview.exception.ForbiddenUserException;
 import com.gsantos.calendar.interview.exception.SlotOverlappedException;
 import com.gsantos.calendar.interview.fixtures.AvailabilityRequestBuilder;
+import com.gsantos.calendar.interview.model.response.CandidateAvailabilityResponse;
+import com.gsantos.calendar.interview.model.response.UserResponse;
 import com.gsantos.calendar.interview.service.GetCandidateAvailabilityService;
 import com.gsantos.calendar.interview.service.SetCandidateAvailabilityService;
 import org.junit.jupiter.api.DynamicTest;
@@ -22,13 +24,21 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
 import java.util.stream.Stream;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
+import static org.apache.commons.lang3.RandomUtils.nextInt;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -52,8 +62,9 @@ class CandidateControllerTest {
     @MockBean
     private GetCandidateAvailabilityService getCandidateAvailabilityService;
 
+    // POST /availability
     @Test
-    void shouldSetInterviewerAvailabilitySuccessfully() throws Exception {
+    void shouldSetInterviewerAvailabilitySuccessfully_POSTAvailability() throws Exception {
         // Given
         var request = AvailabilityRequestBuilder.random();
         var username = randomAlphanumeric(10);
@@ -70,7 +81,7 @@ class CandidateControllerTest {
     }
 
     @Test
-    void shouldReturnBadRequestWhenSlotIsOverlapped() throws Exception {
+    void shouldReturnBadRequestWhenSlotIsOverlapped_POSTAvailability() throws Exception {
         // Given
         var request = AvailabilityRequestBuilder.random();
         doThrow(new SlotOverlappedException("any")).when(setCandidateAvailabilityService).set(any(), any());
@@ -87,7 +98,7 @@ class CandidateControllerTest {
     }
 
     @Test
-    void shouldReturnForbiddenWhenUserIsForbidden() throws Exception {
+    void shouldReturnForbiddenWhenUserIsForbidden_POSTAvailability() throws Exception {
         // Given
         var request = AvailabilityRequestBuilder.random();
         doThrow(new ForbiddenUserException()).when(setCandidateAvailabilityService).set(any(), any());
@@ -104,7 +115,7 @@ class CandidateControllerTest {
     }
 
     @Test
-    void shouldReturnInternalServerErrorWhenAnyOtherErrorHappens() throws Exception {
+    void shouldReturnInternalServerErrorWhenAnyOtherErrorHappens_POSTAvailability() throws Exception {
         // Given
         var request = AvailabilityRequestBuilder.random();
         doThrow(new RuntimeException("kaboom")).when(setCandidateAvailabilityService).set(any(), any());
@@ -121,7 +132,7 @@ class CandidateControllerTest {
     }
 
     @Test
-    void shouldReturnBadRequestWhenMandatoryHeaderIsMissing() throws Exception {
+    void shouldReturnBadRequestWhenMandatoryHeaderIsMissing_POSTAvailability() throws Exception {
         // Given
         var request = AvailabilityRequestBuilder.random();
 
@@ -136,7 +147,7 @@ class CandidateControllerTest {
     }
 
     @TestFactory
-    Stream<DynamicTest> shouldValidateAllMandatoryFields() {
+    Stream<DynamicTest> shouldValidateAllMandatoryFields_POSTAvailability() {
         return Stream.of(
                 AvailabilityRequestBuilder.randomWithEmptyList(),
                 AvailabilityRequestBuilder.randomWithDateAsNull(),
@@ -151,5 +162,81 @@ class CandidateControllerTest {
             // Then
             then(setCandidateAvailabilityService).should(never()).set(any(), any());
         }));
+    }
+
+    // GET /availability
+
+    @Test
+    void shouldReturnCandidateAvailabilitySuccessfully_GETAvailability() throws Exception {
+        // Given
+        var candidate = randomAlphanumeric(10);
+        var interviewer1 = randomAlphanumeric(10);
+        var interviewer2 = randomAlphanumeric(10);
+        var daysInFuture = nextInt(10, 20);
+
+        var expectedResult = new CandidateAvailabilityResponse(
+                new UserResponse(candidate),
+                List.of(
+                        new CandidateAvailabilityResponse.InterviewerAvailabilityResponse(new UserResponse(interviewer1), List.of()),
+                        new CandidateAvailabilityResponse.InterviewerAvailabilityResponse(new UserResponse(interviewer2), List.of())
+                )
+        );
+        given(getCandidateAvailabilityService.get(candidate, List.of(interviewer1, interviewer2), daysInFuture)).willReturn(expectedResult);
+
+        // When
+        var response = mockMvc.perform(get(PATH_AVAILABILITY)
+                .header(USERNAME_HEADER, candidate)
+                .param("interviewers", String.format("%s,%s", interviewer1, interviewer2))
+                .param("daysInFuture", String.valueOf(daysInFuture)))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse().getContentAsByteArray();
+
+        var responseObj = objectMapper.readValue(response, CandidateAvailabilityResponse.class);
+
+        // Then
+        then(getCandidateAvailabilityService).should().get(anyString(), anyList(), anyInt());
+
+        assertThat(responseObj).isEqualTo(expectedResult);
+    }
+
+    @Test
+    void shouldReturnCandidateAvailabilitySuccessfullyBySettingDefaultValueToNonMandatoryParams_GETAvailability() throws Exception {
+        // Given
+        var candidate = randomAlphanumeric(10);
+        var interviewer = randomAlphanumeric(10);
+
+        given(getCandidateAvailabilityService.get(candidate, List.of(interviewer), 7)).willReturn(new CandidateAvailabilityResponse());
+
+        // When
+        mockMvc.perform(get(PATH_AVAILABILITY)
+                .header(USERNAME_HEADER, candidate)
+                .param("interviewers", interviewer))
+                .andExpect(status().isOk());
+
+        // Then
+        then(getCandidateAvailabilityService).should().get(candidate, List.of(interviewer), 7);
+    }
+
+    @Test
+    void shouldReturnBadRequestWhenMandatoryHeaderIsMissing_GETAvailability() throws Exception {
+        // When
+        mockMvc.perform(get(PATH_AVAILABILITY)
+                .param("interviewers", "interviewer1,interviewer2"))
+                .andExpect(status().isBadRequest());
+
+        // Then
+        then(getCandidateAvailabilityService).should(never()).get(anyString(), anyList(), anyInt());
+    }
+
+    @Test
+    void shouldReturnBadRequestWhenMandatoryQueryParamIsMissing_GETAvailability() throws Exception {
+        // When
+        mockMvc.perform(get(PATH_AVAILABILITY)
+                .header("username", "any"))
+                .andExpect(status().isBadRequest());
+
+        // Then
+        then(getCandidateAvailabilityService).should(never()).get(anyString(), anyList(), anyInt());
     }
 }

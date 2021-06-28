@@ -14,8 +14,11 @@ import java.util.Objects;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class CandidateAvailabilityResponse {
-    private final UserResponse candidate;
-    private final List<InterviewerAvailabilityResponse> availableSlotsByInterviewer;
+    private UserResponse candidate;
+    private List<InterviewerAvailabilityResponse> availableSlotsByInterviewer;
+
+    public CandidateAvailabilityResponse() {
+    }
 
     public CandidateAvailabilityResponse(UserResponse candidate, List<InterviewerAvailabilityResponse> availableSlotsByInterviewer) {
         this.candidate = candidate;
@@ -26,8 +29,16 @@ public class CandidateAvailabilityResponse {
         return candidate;
     }
 
+    public void setCandidate(UserResponse candidate) {
+        this.candidate = candidate;
+    }
+
     public List<InterviewerAvailabilityResponse> getAvailableSlotsByInterviewer() {
         return availableSlotsByInterviewer;
+    }
+
+    public void setAvailableSlotsByInterviewer(List<InterviewerAvailabilityResponse> availableSlotsByInterviewer) {
+        this.availableSlotsByInterviewer = availableSlotsByInterviewer;
     }
 
     @Override
@@ -45,8 +56,11 @@ public class CandidateAvailabilityResponse {
     }
 
     public static class InterviewerAvailabilityResponse {
-        private final UserResponse interviewer;
-        private final List<DateSlotsResponse> availableSlotsByDate;
+        private UserResponse interviewer;
+        private List<DateSlotsResponse> availableSlotsByDate;
+
+        public InterviewerAvailabilityResponse() {
+        }
 
         public InterviewerAvailabilityResponse(UserResponse interviewer, List<DateSlotsResponse> availableSlotsByDate) {
             this.interviewer = interviewer;
@@ -57,8 +71,16 @@ public class CandidateAvailabilityResponse {
             return interviewer;
         }
 
+        public void setInterviewer(UserResponse interviewer) {
+            this.interviewer = interviewer;
+        }
+
         public List<DateSlotsResponse> getAvailableSlotsByDate() {
             return availableSlotsByDate;
+        }
+
+        public void setAvailableSlotsByDate(List<DateSlotsResponse> availableSlotsByDate) {
+            this.availableSlotsByDate = availableSlotsByDate;
         }
 
         @Override
@@ -77,8 +99,11 @@ public class CandidateAvailabilityResponse {
     }
 
     public static class DateSlotsResponse {
-        private final LocalDate date;
-        private final List<SlotResponse> slots;
+        private LocalDate date;
+        private List<SlotResponse> slots;
+
+        public DateSlotsResponse() {
+        }
 
         public DateSlotsResponse(LocalDate date, List<SlotResponse> slots) {
             this.date = date;
@@ -89,8 +114,16 @@ public class CandidateAvailabilityResponse {
             return date;
         }
 
+        public void setDate(LocalDate date) {
+            this.date = date;
+        }
+
         public List<SlotResponse> getSlots() {
             return slots;
+        }
+
+        public void setSlots(List<SlotResponse> slots) {
+            this.slots = slots;
         }
 
         @Override
@@ -109,8 +142,11 @@ public class CandidateAvailabilityResponse {
     }
 
     public static class SlotResponse {
-        private final LocalTime startTime;
-        private final LocalTime endTime;
+        private LocalTime startTime;
+        private LocalTime endTime;
+
+        public SlotResponse() {
+        }
 
         public SlotResponse(LocalTime startTime, LocalTime endTime) {
             this.startTime = startTime;
@@ -121,8 +157,16 @@ public class CandidateAvailabilityResponse {
             return startTime;
         }
 
+        public void setStartTime(LocalTime startTime) {
+            this.startTime = startTime;
+        }
+
         public LocalTime getEndTime() {
             return endTime;
+        }
+
+        public void setEndTime(LocalTime endTime) {
+            this.endTime = endTime;
         }
 
         @Override

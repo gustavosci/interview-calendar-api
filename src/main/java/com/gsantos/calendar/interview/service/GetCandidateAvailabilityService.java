@@ -48,6 +48,7 @@ public class GetCandidateAvailabilityService {
     public CandidateAvailabilityResponse get(final String username, final List<String> interviewers, final int daysInFuture) {
         LOGGER.info("Getting candidate availability. User: {} - Interviewers: {}", username, interviewers);
 
+        // TODO: IMPROVE METHOD NAMES
         userValidator.validate(username, UserType.CANDIDATE);
         interviewers.forEach(i -> userValidator.validateUserType(i, UserType.INTERVIEWER));
 
