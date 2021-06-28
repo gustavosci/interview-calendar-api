@@ -47,7 +47,7 @@ The API provides 4 endpoints to achieve the challenge's requirements:
 4. GET /v1/candidates/availability - responsible to get the available slots of a given candidate and one or more interviewers. It's also possible to define a limit date in the future for the search. By default, the service considers slots from the current day to 7 days in the future.
 
 **Additional information:**
-- For all the endpoints, except the `/v1/users`, the header `username` is mandatory. That emulates the `Authorization` header that a real application would probably have. That's the user identifier and will be the base of all other actions.   
+- For all the endpoints (except `/v1/users`) the header `username` is mandatory. That emulates the `Authorization` header that a real application would probably have. That's the user identifier and will be the base of all other actions.   
 - For further details regarding the API's contracts (parameters, request/response models, etc), please access our swagger by [clicking here](http://localhost:8080/swagger-ui/). PS: The application must be running.
 
 ## Technical Details
