@@ -1,6 +1,6 @@
 aws:
   dynamodb:
-    url: http://localhost:8000
+    url: http://${DYNAMODB_HOST:localhost}:8000
     tables:
       calendar: calendar
       user: user

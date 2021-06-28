@@ -1,0 +1,28 @@
+version: '3.2'
+
+services:
+  interview-calendar:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    image: gustavosci/interview-calendar
+    container_name: interview-calendar
+    ports:
+      - 8080:8080
+    depends_on:
+      - "dynamodb"
+    environment:
+      - AWS_REGION=eu-west-1
+      - AWS_ACCESS_KEY_ID=dummy
+      - AWS_SECRET_ACCESS_KEY=dummy
+      - DYNAMODB_HOST=dynamodb
+
+  dynamodb:
+    image: amazon/dynamodb-local:1.15.0
+    container_name: dynamodb-local
+    command: "-jar DynamoDBLocal.jar -sharedDb -optimizeDbBeforeStartup -dbPath ./data"
+    volumes:
+      - "./build/docker/dynamodb:/home/dynamodblocal/data"
+    ports:
+      - 8000:8000
+    working_dir: /home/dynamodblocal

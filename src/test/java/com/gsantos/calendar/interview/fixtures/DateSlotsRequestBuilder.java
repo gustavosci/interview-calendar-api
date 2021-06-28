@@ -20,8 +20,8 @@ public final class DateSlotsRequestBuilder {
         var object = new AvailabilityRequest.DateSlotsRequest();
         object.setDate(LocalDate.now());
         object.setAvailableSlots(Set.of(
-                SlotRequestBuilder.random(LocalTime.of(LocalTime.now().plusHours(1).getHour(), 0, 0)),
-                SlotRequestBuilder.random(LocalTime.of(LocalTime.now().plusHours(7).getHour(), 0, 0))
+                SlotRequestBuilder.random(LocalTime.of(17, 0, 0)),
+                SlotRequestBuilder.random(LocalTime.of(20, 0, 0))
         ));
         return object;
     }

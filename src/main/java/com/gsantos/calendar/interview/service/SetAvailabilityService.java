@@ -43,9 +43,9 @@ public abstract class SetAvailabilityService {
 
         userValidator.validate(username, getUserType(), () -> {throw new ForbiddenUserException();});
 
-        var storedCalendar = getCalendarsByDateAndValidateOverlapping(username, request);
+        var storedCalendars = getCalendarsByDateAndValidateOverlapping(username, request);
         request.getAvailableSlotsByDate().forEach(slotsByDate ->
-                Optional.ofNullable(storedCalendar.get(slotsByDate.getDate()))
+                Optional.ofNullable(storedCalendars.get(slotsByDate.getDate()))
                         .ifPresentOrElse(c -> {
                                     var slotsDDB = slotDDBMapper.apply(slotsByDate.getAvailableSlots());
                                     c.getAvailableSlots().addAll(slotsDDB);

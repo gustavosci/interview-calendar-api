@@ -20,10 +20,10 @@ import static java.util.stream.Collectors.toList;
 public class CandidateAvailabilityResponseMapper implements BiFunction<String, Map<String, List<DateAvailability>>, CandidateAvailabilityResponse> {
 
     @Override
-    public CandidateAvailabilityResponse apply(String username, Map<String, List<DateAvailability>> matchesByInterviewer) {
-        if (username == null || matchesByInterviewer == null) return null;
+    public CandidateAvailabilityResponse apply(String candidate, Map<String, List<DateAvailability>> matchesByInterviewer) {
+        if (candidate == null || matchesByInterviewer == null) return null;
 
-        var candidateResponse = new UserResponse(username);
+        var candidateResponse = new UserResponse(candidate);
         var interviewersAvailabilityResponse = matchesByInterviewer.entrySet().stream()
                 .map(interviewerEntry -> {
                     var interviewerResponse = new UserResponse(interviewerEntry.getKey());
