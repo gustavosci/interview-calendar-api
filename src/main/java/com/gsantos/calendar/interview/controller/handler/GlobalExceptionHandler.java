@@ -6,7 +6,7 @@
 package com.gsantos.calendar.interview.controller.handler;
 
 import com.gsantos.calendar.interview.exception.BodilessHttpException;
-import com.gsantos.calendar.interview.exception.HttpException;
+import com.gsantos.calendar.interview.exception.BodyHttpException;
 import com.gsantos.calendar.interview.model.response.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,8 +42,8 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(HttpException.class)
-    public ResponseEntity<ErrorResponse> handleAnyHttpException(final HttpException ex) {
+    @ExceptionHandler(BodyHttpException.class)
+    public ResponseEntity<ErrorResponse> handleAnyBodyHttpException(final BodyHttpException ex) {
         var errorResponse = new ErrorResponse(ex.getDetailedMessage());
         return new ResponseEntity<>(errorResponse, ex.getStatus());
     }
@@ -53,7 +53,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(ex.getStatus());
     }
 
-    // Exception handler must always be the last one
+    // General Exception handler must always be the last one
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGeneralException(final Exception ex) {
         var errorResponse = new ErrorResponse(ex.getMessage());

@@ -15,6 +15,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 public class AvailabilityRequest {
 
@@ -61,12 +62,12 @@ public class AvailabilityRequest {
         private LocalDate date;
 
         @NotEmpty
-        private List<@Valid @SlotPeriodTime(maxPeriodHour = 1) SlotRequest> availableSlots;
+        private Set<@Valid @SlotPeriodTime(maxPeriodHour = 1) SlotRequest> availableSlots;
 
         public DateSlotsRequest() {
         }
 
-        public DateSlotsRequest(LocalDate date, List<SlotRequest> availableSlots) {
+        public DateSlotsRequest(@NotNull LocalDate date, @NotEmpty Set<@Valid @SlotPeriodTime(maxPeriodHour = 1) SlotRequest> availableSlots) {
             this.date = date;
             this.availableSlots = availableSlots;
         }
@@ -79,11 +80,11 @@ public class AvailabilityRequest {
             this.date = date;
         }
 
-        public List<SlotRequest> getAvailableSlots() {
+        public Set<SlotRequest> getAvailableSlots() {
             return availableSlots;
         }
 
-        public void setAvailableSlots(List<SlotRequest> availableSlots) {
+        public void setAvailableSlots(Set<SlotRequest> availableSlots) {
             this.availableSlots = availableSlots;
         }
 

@@ -31,6 +31,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
@@ -65,13 +66,13 @@ class SetAvailabilityTest {
         // Given
         var username = randomAlphanumeric(10);
 
-        var slotRequests1 = List.of(
+        var slotRequests1 = Set.of(
                 new AvailabilityRequest.SlotRequest(LocalTime.of(8, 0, 0), LocalTime.of(9, 0, 0)),
                 new AvailabilityRequest.SlotRequest(LocalTime.of(10, 0, 0), LocalTime.of(11, 0, 0))
         );
         var dateSlotRequest1 = new AvailabilityRequest.DateSlotsRequest(LocalDate.now(), slotRequests1);
 
-        var slotRequests2 = List.of(
+        var slotRequests2 = Set.of(
                 new AvailabilityRequest.SlotRequest(LocalTime.of(8, 0, 0), LocalTime.of(9, 0, 0)),
                 new AvailabilityRequest.SlotRequest(LocalTime.of(10, 0, 0), LocalTime.of(11, 0, 0))
         );
@@ -91,7 +92,7 @@ class SetAvailabilityTest {
         service.set(username, request);
 
         // Then
-        then(userValidator).should().validate(any(), any());
+        then(userValidator).should().validate(any(), any(), any());
         then(calendarRepository).should(times(2)).getCalendarByUserAndDate(any(), any());
         then(calendarRepository).should(times(2)).save(any());
     }
@@ -108,13 +109,13 @@ class SetAvailabilityTest {
             // Given
             var username = randomAlphanumeric(10);
 
-            var slotRequests1 = List.of(
+            var slotRequests1 = Set.of(
                     new AvailabilityRequest.SlotRequest(LocalTime.of(8, 0, 0), LocalTime.of(9, 0, 0)),
                     new AvailabilityRequest.SlotRequest(LocalTime.of(10, 0, 0), LocalTime.of(11, 0, 0))
             );
             var dateSlotRequest1 = new AvailabilityRequest.DateSlotsRequest(LocalDate.now(), slotRequests1);
 
-            var slotRequests2 = List.of(
+            var slotRequests2 = Set.of(
                     new AvailabilityRequest.SlotRequest(LocalTime.of(8, 0, 0), LocalTime.of(9, 0, 0)),
                     new AvailabilityRequest.SlotRequest(LocalTime.of(10, 0, 0), LocalTime.of(15, 0, 0))
             );
@@ -142,13 +143,13 @@ class SetAvailabilityTest {
         var username = randomAlphanumeric(10);
         var request = AvailabilityRequestBuilder.random();
 
-        doThrow(new ForbiddenUserException()).when(userValidator).validate(any(), any());
+        doThrow(new ForbiddenUserException()).when(userValidator).validate(any(), any(), any());
 
         // When
         Assertions.assertThrows(ForbiddenUserException.class, () -> service.set(username, request));
 
         // Then
-        then(userValidator).should().validate(any(), any());
+        then(userValidator).should().validate(any(), any(), any());
         then(calendarRepository).should(never()).save(any());
         then(calendarRepository).should(never()).getCalendarByUserAndDate(any(), any());
     }

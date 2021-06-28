@@ -8,6 +8,7 @@ package com.gsantos.calendar.interview.fixtures;
 import com.gsantos.calendar.interview.model.request.AvailabilityRequest;
 
 import java.util.List;
+import java.util.Set;
 
 public final class AvailabilityRequestBuilder {
 
@@ -37,7 +38,7 @@ public final class AvailabilityRequestBuilder {
     public static AvailabilityRequest randomWithSlotsEmpty() {
         var object = new AvailabilityRequest();
         var dateSlotsRequest = DateSlotsRequestBuilder.random();
-        dateSlotsRequest.setAvailableSlots(List.of());
+        dateSlotsRequest.setAvailableSlots(Set.of());
         object.setAvailableSlotsByDate(List.of(dateSlotsRequest));
         return object;
     }

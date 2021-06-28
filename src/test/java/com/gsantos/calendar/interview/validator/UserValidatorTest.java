@@ -5,8 +5,6 @@
 
 package com.gsantos.calendar.interview.validator;
 
-import com.gsantos.calendar.interview.exception.ForbiddenUserException;
-import com.gsantos.calendar.interview.exception.UnexpectedUserTypeException;
 import com.gsantos.calendar.interview.fixtures.UserDDBBuilder;
 import com.gsantos.calendar.interview.model.ddb.UserDDB;
 import com.gsantos.calendar.interview.model.domain.UserType;
@@ -43,7 +41,7 @@ class UserValidatorTest {
         given(userRepository.getUserByUsername(username)).willReturn(Optional.of(userDDB));
 
         // When
-        validator.validate(username, UserType.valueOf(userDDB.getType().name()));
+        validator.validate(username, UserType.valueOf(userDDB.getType().name()), () -> {throw new RuntimeException();});
 
         // Then
         then(userRepository).should().getUserByUsername(any());
@@ -57,7 +55,7 @@ class UserValidatorTest {
         given(userRepository.getUserByUsername(username)).willReturn(Optional.empty());
 
         // When
-        Assertions.assertThrows(ForbiddenUserException.class, () -> validator.validate(username, UserType.CANDIDATE));
+        Assertions.assertThrows(RuntimeException.class, () -> validator.validate(username, UserType.CANDIDATE, () -> {throw new RuntimeException();}));
 
         // Then
         then(userRepository).should().getUserByUsername(any());
@@ -73,38 +71,7 @@ class UserValidatorTest {
         given(userRepository.getUserByUsername(username)).willReturn(Optional.of(userDDB));
 
         // When
-        Assertions.assertThrows(ForbiddenUserException.class, () -> validator.validate(username, userType));
-
-        // Then
-        then(userRepository).should().getUserByUsername(any());
-    }
-
-    @Test
-    void shouldValidateUserTypeWhenIsDifferentFromExpected(){
-        // Given
-        var userDDB = UserDDBBuilder.random();
-        var username = randomAlphanumeric(10);
-        var expectedUserType = userDDB.getType() == UserDDB.UserType.CANDIDATE ? UserType.INTERVIEWER : UserType.CANDIDATE;
-
-        given(userRepository.getUserByUsername(username)).willReturn(Optional.of(userDDB));
-
-        // When
-        Assertions.assertThrows(UnexpectedUserTypeException.class, () -> validator.validateUserType(username, expectedUserType));
-
-        // Then
-        then(userRepository).should().getUserByUsername(any());
-    }
-
-    @Test
-    void shouldValidateUserTypeWhenIsTheExpected(){
-        // Given
-        var userDDB = UserDDBBuilder.random();
-        var username = randomAlphanumeric(10);
-
-        given(userRepository.getUserByUsername(username)).willReturn(Optional.of(userDDB));
-
-        // When
-        validator.validateUserType(username, UserType.valueOf(userDDB.getType().name()));
+        Assertions.assertThrows(RuntimeException.class, () -> validator.validate(username, userType, () -> {throw new RuntimeException();}));
 
         // Then
         then(userRepository).should().getUserByUsername(any());

@@ -7,9 +7,11 @@ package com.gsantos.calendar.interview.exception;
 
 import org.springframework.http.HttpStatus;
 
-public abstract class BodilessHttpException extends HttpException {
+public abstract class BodyHttpException extends HttpException {
 
-    protected BodilessHttpException(HttpStatus status) {
+    protected BodyHttpException(HttpStatus status) {
         super(status);
     }
+
+    public abstract String getDetailedMessage();
 }

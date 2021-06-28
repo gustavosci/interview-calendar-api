@@ -112,10 +112,10 @@ class GetCandidateAvailabilityServiceTest {
         var response = service.get(candidate, List.of(interviewer1, interviewer2, interviewer3), daysInFuture);
 
         // Then
-        then(userValidator).should().validate(candidate, UserType.CANDIDATE);
-        then(userValidator).should().validateUserType(interviewer1, UserType.INTERVIEWER);
-        then(userValidator).should().validateUserType(interviewer2, UserType.INTERVIEWER);
-        then(userValidator).should().validateUserType(interviewer3, UserType.INTERVIEWER);
+        then(userValidator).should().validate(eq(candidate), eq(UserType.CANDIDATE), any());
+        then(userValidator).should().validate(eq(interviewer1), eq(UserType.INTERVIEWER), any());
+        then(userValidator).should().validate(eq(interviewer2), eq(UserType.INTERVIEWER), any());
+        then(userValidator).should().validate(eq(interviewer3), eq(UserType.INTERVIEWER), any());
         then(calendarRepository).should().getUserAvailability(any(), dateFromCaptor.capture(), dateToCaptor.capture());
         then(calendarRepository).should(times(6)).getCalendarByUserAndDate(any(), any());
         then(candidateAvailabilityResponseMapper).should().apply(eq(candidate), matchesByInterviewerCaptor.capture());
@@ -132,13 +132,13 @@ class GetCandidateAvailabilityServiceTest {
     void shouldValidateCandidateUser() {
         // Given
         var username = randomAlphanumeric(10);
-        doThrow(ForbiddenUserException.class).when(userValidator).validate(username, UserType.CANDIDATE);
+        doThrow(ForbiddenUserException.class).when(userValidator).validate(eq(username), eq(UserType.CANDIDATE), any());
 
         // When
         Assertions.assertThrows(ForbiddenUserException.class, () -> service.get(username, List.of(), nextInt()));
 
         // Then
-        then(userValidator).should(never()).validateUserType(any(), any());
+        then(userValidator).should().validate(any(), any(), any());
         then(calendarRepository).should(never()).getCalendarByUserAndDate(any(), any());
         then(calendarRepository).should(never()).getUserAvailability(any(), any(), any());
         then(candidateAvailabilityResponseMapper).should(never()).apply(any(), any());
@@ -150,15 +150,15 @@ class GetCandidateAvailabilityServiceTest {
         var username = randomAlphanumeric(10);
         var interviewers = List.of(randomAlphanumeric(10), randomAlphanumeric(10));
 
-        doThrow(UnexpectedUserTypeException.class).when(userValidator).validateUserType(interviewers.get(1), UserType.INTERVIEWER);
+        doThrow(UnexpectedUserTypeException.class).when(userValidator).validate(eq(interviewers.get(1)), eq(UserType.INTERVIEWER), any());
 
         // When
         Assertions.assertThrows(UnexpectedUserTypeException.class, () -> service.get(username, interviewers, nextInt()));
 
         // Then
-        then(userValidator).should().validate(any(), any());
-        then(userValidator).should().validateUserType(interviewers.get(0), UserType.INTERVIEWER);
-        then(userValidator).should().validateUserType(interviewers.get(1), UserType.INTERVIEWER);
+        then(userValidator).should().validate(eq(username), eq(UserType.CANDIDATE), any());
+        then(userValidator).should().validate(eq(interviewers.get(0)), eq(UserType.INTERVIEWER), any());
+        then(userValidator).should().validate(eq(interviewers.get(1)), eq(UserType.INTERVIEWER), any());
         then(calendarRepository).should(never()).getCalendarByUserAndDate(any(), any());
         then(calendarRepository).should(never()).getUserAvailability(any(), any(), any());
         then(candidateAvailabilityResponseMapper).should(never()).apply(any(), any());

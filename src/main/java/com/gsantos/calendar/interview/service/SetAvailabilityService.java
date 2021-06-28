@@ -5,6 +5,7 @@
 
 package com.gsantos.calendar.interview.service;
 
+import com.gsantos.calendar.interview.exception.ForbiddenUserException;
 import com.gsantos.calendar.interview.exception.SlotOverlappedException;
 import com.gsantos.calendar.interview.mapping.CalendarDDBMapper;
 import com.gsantos.calendar.interview.mapping.SlotDDBMapper;
@@ -40,7 +41,7 @@ public abstract class SetAvailabilityService {
     public void set(final String username, final AvailabilityRequest request) {
         LOGGER.info("Setting availability. Request: {}", request);
 
-        userValidator.validate(username, getUserType());
+        userValidator.validate(username, getUserType(), () -> {throw new ForbiddenUserException();});
 
         var storedCalendar = getCalendarsByDateAndValidateOverlapping(username, request);
         request.getAvailableSlotsByDate().forEach(slotsByDate ->

@@ -7,7 +7,7 @@ package com.gsantos.calendar.interview.exception;
 
 import org.springframework.http.HttpStatus;
 
-public class SlotOverlappedException extends HttpException {
+public class SlotOverlappedException extends BodyHttpException {
 
     private final String message;
 

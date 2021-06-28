@@ -11,7 +11,7 @@ import com.gsantos.calendar.interview.utils.DateConverterUtil;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -22,7 +22,7 @@ class CalendarDDBMapperTest {
     @Test
     void shouldMapRequestToCalendarDDBSuccessfully() {
         // Given
-        var dateSlotsRequest = new AvailabilityRequest.DateSlotsRequest(LocalDate.now().plusDays(1), List.of());
+        var dateSlotsRequest = new AvailabilityRequest.DateSlotsRequest(LocalDate.now().plusDays(1), Set.of());
         var username = "anyuser";
 
         // When

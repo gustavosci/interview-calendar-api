@@ -7,7 +7,7 @@ package com.gsantos.calendar.interview.exception;
 
 import org.springframework.http.HttpStatus;
 
-public class UnexpectedUserTypeException extends HttpException {
+public class UnexpectedUserTypeException extends BodyHttpException {
 
     private final String message;
 

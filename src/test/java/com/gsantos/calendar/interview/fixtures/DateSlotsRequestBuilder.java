@@ -8,7 +8,8 @@ package com.gsantos.calendar.interview.fixtures;
 import com.gsantos.calendar.interview.model.request.AvailabilityRequest;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.time.LocalTime;
+import java.util.Set;
 
 public final class DateSlotsRequestBuilder {
 
@@ -18,7 +19,10 @@ public final class DateSlotsRequestBuilder {
     public static AvailabilityRequest.DateSlotsRequest random() {
         var object = new AvailabilityRequest.DateSlotsRequest();
         object.setDate(LocalDate.now());
-        object.setAvailableSlots(List.of(SlotRequestBuilder.random(), SlotRequestBuilder.random()));
+        object.setAvailableSlots(Set.of(
+                SlotRequestBuilder.random(LocalTime.of(LocalTime.now().plusHours(1).getHour(), 0, 0)),
+                SlotRequestBuilder.random(LocalTime.of(LocalTime.now().plusHours(7).getHour(), 0, 0))
+        ));
         return object;
     }
 }

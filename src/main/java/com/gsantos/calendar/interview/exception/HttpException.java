@@ -7,7 +7,7 @@ package com.gsantos.calendar.interview.exception;
 
 import org.springframework.http.HttpStatus;
 
-public abstract class HttpException extends IllegalStateException {
+public abstract class HttpException extends RuntimeException {
 
     private final HttpStatus status;
 
@@ -18,6 +18,4 @@ public abstract class HttpException extends IllegalStateException {
     public HttpStatus getStatus() {
         return status;
     }
-
-    public abstract String getDetailedMessage();
 }

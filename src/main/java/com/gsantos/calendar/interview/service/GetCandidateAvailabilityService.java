@@ -5,6 +5,8 @@
 
 package com.gsantos.calendar.interview.service;
 
+import com.gsantos.calendar.interview.exception.ForbiddenUserException;
+import com.gsantos.calendar.interview.exception.UnexpectedUserTypeException;
 import com.gsantos.calendar.interview.mapping.CandidateAvailabilityResponseMapper;
 import com.gsantos.calendar.interview.model.ddb.CalendarDDB;
 import com.gsantos.calendar.interview.model.domain.DateAvailability;
@@ -48,9 +50,7 @@ public class GetCandidateAvailabilityService {
     public CandidateAvailabilityResponse get(final String username, final List<String> interviewers, final int daysInFuture) {
         LOGGER.info("Getting candidate availability. User: {} - Interviewers: {}", username, interviewers);
 
-        // TODO: IMPROVE METHOD NAMES
-        userValidator.validate(username, UserType.CANDIDATE);
-        interviewers.forEach(i -> userValidator.validateUserType(i, UserType.INTERVIEWER));
+        validateRequest(username, interviewers);
 
         var now = LocalDate.now();
         var candidateAvailability = calendarRepository.getUserAvailability(username, now, now.plusDays(daysInFuture))
@@ -69,6 +69,15 @@ public class GetCandidateAvailabilityService {
                 );
 
         return candidateAvailabilityResponseMapper.apply(username, matchesByInterviewer);
+    }
+
+    private void validateRequest(final String username, final List<String> interviewers) {
+        userValidator.validate(username, UserType.CANDIDATE, () -> {throw new ForbiddenUserException();});
+        interviewers.forEach(i -> userValidator.validate(i, UserType.INTERVIEWER, () -> {
+            var message = String.format("It's expected for the user %s to exist and be %s", i, UserType.INTERVIEWER);
+            LOGGER.warn(message);
+            throw new UnexpectedUserTypeException(message);
+        }));
     }
 
     private Map<String, List<CalendarDDB>> getInterviewersAvailabilityByDate(final List<String> interviewers, final Set<String> candidateAvailabilityDates) {

@@ -10,7 +10,8 @@ import com.gsantos.calendar.interview.fixtures.SlotRequestBuilder;
 import com.gsantos.calendar.interview.model.ddb.CalendarDDB;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
+import java.time.LocalTime;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -22,7 +23,7 @@ class SlotDDBMapperTest {
     @Test
     void shouldMapSlotRequestToSlotDDBSuccessfully() {
         // Given
-        var slotsRequest = List.of(SlotRequestBuilder.random(), SlotRequestBuilder.random());
+        var slotsRequest = Set.of(SlotRequestBuilder.random(LocalTime.now().plusHours(2)), SlotRequestBuilder.random(LocalTime.now().plusHours(7)));
         var expected = slotsRequest.stream()
                 .map(s -> new CalendarDDB.SlotDDB(s.getStartTime(), s.getEndTime()))
                 .collect(Collectors.toList());
@@ -48,7 +49,7 @@ class SlotDDBMapperTest {
     @Test
     void shouldReturnEmptyListWhenEmpty() {
         // When
-        var response = mapper.apply(List.of());
+        var response = mapper.apply(Set.of());
 
         // Then
         assertThat(response).isEmpty();

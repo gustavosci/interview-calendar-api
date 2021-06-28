@@ -5,13 +5,9 @@
 
 package com.gsantos.calendar.interview.validator;
 
-import com.gsantos.calendar.interview.exception.ForbiddenUserException;
-import com.gsantos.calendar.interview.exception.UnexpectedUserTypeException;
 import com.gsantos.calendar.interview.model.ddb.UserDDB;
 import com.gsantos.calendar.interview.model.domain.UserType;
 import com.gsantos.calendar.interview.repository.UserRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -19,28 +15,16 @@ import java.util.Optional;
 @Component
 public class UserValidator {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserValidator.class);
-
     private final UserRepository userRepository;
 
     public UserValidator(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
-    public void validate(final String username, final UserType type) {
+    public void validate(final String username, final UserType type, final Runnable action) {
         var user = getUserFromDDB(username);
         var isUserValid = user.stream().anyMatch(u -> u.getType().name().equals(type.name()));
-        if (!isUserValid) throw new ForbiddenUserException();
-    }
-
-    public void validateUserType(final String username, final UserType expectedType) {
-        getUserFromDDB(username).ifPresent(u -> {
-            if (!u.getType().name().equals(expectedType.name())) {
-                var message = String.format("It's expected for the user %s to be %s", username, expectedType);
-                LOGGER.warn(message);
-                throw new UnexpectedUserTypeException(message);
-            }
-        });
+        if (!isUserValid) action.run();
     }
 
     private Optional<UserDDB> getUserFromDDB(final String username) {

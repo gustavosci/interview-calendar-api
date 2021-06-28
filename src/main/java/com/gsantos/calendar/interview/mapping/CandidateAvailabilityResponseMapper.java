@@ -34,11 +34,13 @@ public class CandidateAvailabilityResponseMapper implements BiFunction<String, M
     }
 
     private List<CandidateAvailabilityResponse.DateSlotsResponse> mapDateSlotsToResponse(final List<DateAvailability> dateSlots) {
-        return dateSlots.stream().map(dateSlot -> {
-            var slotsResponse = dateSlot.getSlots().stream()
-                    .map(s -> new CandidateAvailabilityResponse.SlotResponse(s.getStartTime(), s.getEndTime()))
-                    .collect(toList());
-            return new CandidateAvailabilityResponse.DateSlotsResponse(dateSlot.getDate(), slotsResponse);
-        }).collect(toList());
+        return dateSlots.stream()
+                .filter(dateSlot -> !dateSlot.getSlots().isEmpty())
+                .map(dateSlot -> {
+                    var slotsResponse = dateSlot.getSlots().stream()
+                            .map(s -> new CandidateAvailabilityResponse.SlotResponse(s.getStartTime(), s.getEndTime()))
+                            .collect(toList());
+                    return new CandidateAvailabilityResponse.DateSlotsResponse(dateSlot.getDate(), slotsResponse);
+                }).collect(toList());
     }
 }
